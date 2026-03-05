@@ -221,7 +221,7 @@ body { font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text)
 .tbl-search:focus { border-color:var(--primary-light); }
 .btn-excel { padding:7px 16px; border-radius:8px; background:linear-gradient(135deg,#217346,#2e9e5e); color:#fff; font-family:'Tajawal',sans-serif; font-size:13px; border:none; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px; }
 table { width:100%; border-collapse:collapse; font-size:13px; }
-thead th { background:#f8f7f5; padding:11px 14px; text-align:right; font-size:12px; font-weight:700; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
+thead th { background:#f8f7f5; padding:11px 14px; text-align:center; font-size:12px; font-weight:700; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
 tbody tr { border-bottom:1px solid #f0ede8; transition:background .15s; }
 tbody tr:hover { background:#faf9f7; }
 tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
@@ -2114,30 +2114,32 @@ async function uploadFile(file, refNum) {
 async function platformOnSubmit(data) {
   const first = data.products && data.products[0] ? data.products[0] : {};
   const refNum = data.refNum;
+  const products = data.products ? data.products.map(p => ({...p, status:'pending'})) : [];
 
-  // رفع الملفات إلى Supabase Storage
-  const fileUrls = { riada_file: '', national_file: '', cert_file: '' };
+  // رفع الملفات إلى Supabase Storage - كل ملف يُحفظ في السلعة المعنية
   if (data.fileUploads && data.fileUploads.length > 0) {
     for (const fu of data.fileUploads) {
+      const ci = fu.cardIndex !== undefined ? fu.cardIndex : 0;
       try {
-        // Use pre-uploaded URL if available, otherwise upload now
         const url = fu.url ? fu.url : await uploadFile(fu.file, refNum);
-        if (fu.type.includes('uzone_r')) fileUrls.riada_file    = url;
-        else if (fu.type.includes('uzone_n')) fileUrls.national_file = url;
-        else if (fu.type.includes('uzone_c')) fileUrls.cert_file     = url;
+        if (fu.type.includes('uzone_r')) products[ci].riada_file    = url;
+        else if (fu.type.includes('uzone_n')) products[ci].national_file = url;
+        else if (fu.type.includes('uzone_c')) products[ci].cert_file     = url;
       } catch(e) {
         const fname = fu.file ? fu.file.name : (fu.url || '');
         console.warn('File upload failed:', fname, e.message);
-        if (fu.type.includes('uzone_r') && !fileUrls.riada_file)    fileUrls.riada_file    = fname;
-        else if (fu.type.includes('uzone_n') && !fileUrls.national_file) fileUrls.national_file = fname;
-        else if (fu.type.includes('uzone_c') && !fileUrls.cert_file)     fileUrls.cert_file     = fname;
+        if (fu.type.includes('uzone_r') && !products[ci].riada_file)    products[ci].riada_file    = fname;
+        else if (fu.type.includes('uzone_n') && !products[ci].national_file) products[ci].national_file = fname;
+        else if (fu.type.includes('uzone_c') && !products[ci].cert_file)     products[ci].cert_file     = fname;
       }
     }
   } else {
-    // backward compat
-    fileUrls.riada_file    = first.riadaFile    || '';
-    fileUrls.national_file = first.nationalFile || '';
-    fileUrls.cert_file     = first.certFile     || '';
+    // backward compat - files stored in product object
+    if (products[0]) {
+      products[0].riada_file    = products[0].riadaFile    || '';
+      products[0].national_file = products[0].nationalFile || '';
+      products[0].cert_file     = products[0].certFile     || '';
+    }
   }
 
   const row = {
@@ -2152,13 +2154,13 @@ async function platformOnSubmit(data) {
     email:         first.email        || '',
     riada:         first.riada        || 'no',
     national:      first.national     || 'no',
-    riada_file:    fileUrls.riada_file,
-    national_file: fileUrls.national_file,
-    cert_file:     fileUrls.cert_file,
-    products:      data.products  || [],
+    riada_file:    products[0] ? (products[0].riada_file||'') : '',
+    national_file: products[0] ? (products[0].national_file||'') : '',
+    cert_file:     products[0] ? (products[0].cert_file||'') : '',
+    products:      products,
     projects:      data.projects  || [],
     entities:      data.entities  || [],
-    reg_type:      data.products && data.products.length > 1 ? 'multiple' : 'single'
+    reg_type:      products.length > 1 ? 'multiple' : 'single'
   };
 
   try {
@@ -2362,44 +2364,62 @@ function renderTable(list) {
     tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:40px;color:var(--muted)">لا توجد طلبات</td></tr>';
     return;
   }
-  tbody.innerHTML = list.map((r, i) => {
+  let rowNum = 0;
+  tbody.innerHTML = list.map((r) => {
     const rn = r.ref_num || r.refNum || '';
-    const pn = r.product_name || r.productName || '—';
     const co = r.company || '—';
     const cr = r.crn || '—';
     const gv = r.gov || '—';
     const wl = r.wilaya || '—';
     const ph = r.phone || '—';
-    const ri = (r.riada === 'yes') ? '✅' : '❌';
-    const na = (r.national === 'yes') ? '✅' : '❌';
-    const rf = r.riada_file || r.riadaFile || '';
-    const nf = r.national_file || r.nationalFile || '';
-    const cf = r.cert_file || r.certFile || '';
     const dt = fmtDate(r.created_at || r.date);
     const id = r.id;
-    return `<tr id="row_${id}">
-      <td>${i+1}</td>
-      <td><strong style="font-size:11px">${rn}</strong></td>
-      <td>${pn}</td>
-      <td>${co}</td>
-      <td>${cr}</td>
-      <td>${gv}</td>
-      <td>${wl}</td>
-      <td>${ph}</td>
-      <td>${ri}</td>
-      <td>${na}</td>
-      <td>${rf ? fileChip(rf, 'مستند ريادة', rn) : '—'}</td>
-      <td>${nf ? fileChip(nf, 'هوية وطنية', rn) : '—'}</td>
-      <td>${cf ? fileChip(cf, 'شهادة اعتماد', rn) : '—'}</td>
-      <td><span class="badge badge-${r.status}">${sLabel(r.status)}</span></td>
-      <td>${dt}</td>
-      <td style="white-space:nowrap">
-        <button class="tbl-btn tbl-btn-view"    onclick="viewDetail(${id})">عرض</button>
-        <button class="tbl-btn tbl-btn-approve" onclick="changeStatus(${id},'approved')">قبول</button>
-        <button class="tbl-btn tbl-btn-reject"  onclick="changeStatus(${id},'rejected')">رفض</button>
-        <button class="tbl-btn tbl-btn-delete"  onclick="deleteReq(${id})">حذف</button>
-      </td>
-    </tr>`;
+
+    // كل سلعة تصبح صف مستقل كامل
+    const prods = (r.products && r.products.length)
+      ? r.products
+      : [{ productName: r.product_name || r.productName,
+           riada: r.riada, national: r.national,
+           riadaFile: r.riada_file || r.riadaFile,
+           nationalFile: r.national_file || r.nationalFile,
+           certFile: r.cert_file || r.certFile }];
+
+    return prods.map((p, pi) => {
+      rowNum++;
+      const pn = p.productName || p.product_name || '—';
+      const ri = (p.riada === 'yes') ? '✅' : '❌';
+      const na = (p.national === 'yes') ? '✅' : '❌';
+      // مرفقات كل سلعة: من الـ product نفسه أولاً، ثم fallback لمستوى الطلب (للبيانات القديمة)
+      const rf = p.riada_file || p.riadaFile || r.riada_file || r.riadaFile || '';
+      const nf = p.national_file || p.nationalFile || r.national_file || r.nationalFile || '';
+      const cf = p.cert_file || p.certFile || r.cert_file || r.certFile || '';
+      // حالة كل سلعة مستقلة
+      const pStatus = p.status || r.status || 'pending';
+
+      return `<tr>
+        <td>${rowNum}</td>
+        <td><strong style="font-size:11px">${rn}</strong></td>
+        <td>${pn}</td>
+        <td>${co}</td>
+        <td>${cr}</td>
+        <td>${gv}</td>
+        <td>${wl}</td>
+        <td>${ph}</td>
+        <td>${ri}</td>
+        <td>${na}</td>
+        <td>${rf ? fileChip(rf, 'مستند ريادة', rn) : '—'}</td>
+        <td>${nf ? fileChip(nf, 'هوية وطنية', rn) : '—'}</td>
+        <td>${cf ? fileChip(cf, 'شهادة اعتماد', rn) : '—'}</td>
+        <td><span class="badge badge-${pStatus}">${sLabel(pStatus)}</span></td>
+        <td>${dt}</td>
+        <td style="white-space:nowrap">
+          <button class="tbl-btn tbl-btn-view"    onclick="viewDetail(${id})">عرض</button>
+          <button class="tbl-btn tbl-btn-approve" onclick="changeProductStatus(${id},${pi},'approved')">قبول</button>
+          <button class="tbl-btn tbl-btn-reject"  onclick="changeProductStatus(${id},${pi},'rejected')">رفض</button>
+          <button class="tbl-btn tbl-btn-delete"  onclick="deleteProductRow(${id},${pi})">حذف</button>
+        </td>
+      </tr>`;
+    }).join('');
   }).join('');
 }
 
@@ -2407,6 +2427,51 @@ function filterTable(v) {
   if (!v) { renderTable(allRequests); return; }
   const lv = v.toLowerCase();
   renderTable(allRequests.filter(r => JSON.stringify(r).toLowerCase().includes(lv)));
+}
+
+async function changeProductStatus(id, pi, status) {
+  const r = allRequests.find(x => x.id === id);
+  if (!r || !r.products || !r.products[pi]) return;
+  const prevStatus = r.products[pi].status;
+  r.products[pi].status = status;
+  renderTable(allRequests);
+  try {
+    await sbPatch('requests', id, { products: r.products, updated_at: new Date().toISOString() });
+    if ((status === 'approved' || status === 'rejected') && r.email) {
+      const fakeR = { ...r, product_name: r.products[pi].productName || r.products[pi].product_name, status };
+      if (status === 'approved') await sendApprovalEmail(fakeR);
+      else await sendRejectionEmail(fakeR);
+    }
+    refreshAdmin();
+  } catch(e) {
+    r.products[pi].status = prevStatus;
+    renderTable(allRequests);
+    alert('خطأ في تحديث الحالة: ' + e.message);
+  }
+}
+
+async function deleteProductRow(id, pi) {
+  const r = allRequests.find(x => x.id === id);
+  if (!r || !r.products) return;
+  // إذا سلعة وحيدة احذف الطلب كله
+  if (r.products.length <= 1) {
+    deleteReq(id);
+    return;
+  }
+  showConfirm({
+    icon: '🗑️',
+    title: 'حذف السلعة',
+    msg: `هل تريد حذف السلعة "${r.products[pi].productName || r.products[pi].product_name}" من الطلب؟`,
+    okLabel: 'حذف',
+    onOk: async () => {
+      r.products.splice(pi, 1);
+      try {
+        await sbPatch('requests', id, { products: r.products });
+      } catch(e) { console.warn(e); }
+      renderTable(allRequests);
+      renderDashboard();
+    }
+  });
 }
 
 async function changeStatus(id, status) {
@@ -2612,26 +2677,41 @@ function renderReports() {
 // ============================================================
 function exportExcel() {
   if (!allRequests.length) { alert('لا توجد بيانات للتصدير'); return; }
-  const rows = allRequests.map((r, i) => ({
-    '#': i+1,
-    'رقم الطلب': r.ref_num || r.refNum || '',
-    'اسم السلعة': r.product_name || r.productName || '',
-    'الشركة المصنعة': r.company || '',
-    'رقم السجل التجاري': r.crn || '',
-    'المحافظة': r.gov || '',
-    'الولاية': r.wilaya || '',
-    'رقم التواصل': r.phone || '',
-    'البريد الإلكتروني': r.email || '',
-    'ريادة': r.riada === 'yes' ? 'نعم' : 'لا',
-    'هوية المنتج الوطني': r.national === 'yes' ? 'نعم' : 'لا',
-    'مستند ريادة': r.riada_file || r.riadaFile || '',
-    'مستند هوية': r.national_file || r.nationalFile || '',
-    'شهادة اعتماد': r.cert_file || r.certFile || '',
-    'الحالة': sLabel(r.status),
-    'التاريخ': fmtDate(r.created_at || r.date),
-    'أنواع المشاريع': (r.projects || []).join(' | '),
-    'الجهات المالكة': (r.entities || []).join(' | ')
-  }));
+  let rowNum = 0;
+  const rows = [];
+  allRequests.forEach(r => {
+    const prods = (r.products && r.products.length)
+      ? r.products
+      : [{ productName: r.product_name || r.productName,
+           riada: r.riada, national: r.national,
+           riada_file: r.riada_file || r.riadaFile,
+           national_file: r.national_file || r.nationalFile,
+           cert_file: r.cert_file || r.certFile,
+           status: r.status }];
+    prods.forEach(p => {
+      rowNum++;
+      rows.push({
+        '#': rowNum,
+        'رقم الطلب': r.ref_num || r.refNum || '',
+        'اسم السلعة': p.productName || p.product_name || '',
+        'الشركة المصنعة': r.company || p.company || '',
+        'رقم السجل التجاري': r.crn || p.crn || '',
+        'المحافظة': r.gov || p.gov || '',
+        'الولاية': r.wilaya || p.wilaya || '',
+        'رقم التواصل': r.phone || p.phone || '',
+        'البريد الإلكتروني': r.email || p.email || '',
+        'ريادة': (p.riada || r.riada) === 'yes' ? 'نعم' : 'لا',
+        'هوية المنتج الوطني': (p.national || r.national) === 'yes' ? 'نعم' : 'لا',
+        'مستند ريادة': p.riada_file || p.riadaFile || '',
+        'مستند هوية': p.national_file || p.nationalFile || '',
+        'شهادة اعتماد': p.cert_file || p.certFile || '',
+        'الحالة': sLabel(p.status || r.status),
+        'التاريخ': fmtDate(r.created_at || r.date),
+        'أنواع المشاريع': (r.projects || []).join(' | '),
+        'الجهات المالكة': (r.entities || []).join(' | ')
+      });
+    });
+  });
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'الطلبات');
