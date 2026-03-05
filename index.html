@@ -2078,6 +2078,19 @@ function doLogout() {
 function openForm() {
   showView('formView');
   window.scrollTo(0,0);
+  // Auto-fill manufacturer data if logged in
+  if (currentManufacturer) {
+    setTimeout(() => {
+      const companyEl = document.getElementById('company_1');
+      const crnEl = document.getElementById('crn_1');
+      const phoneEl = document.getElementById('phone_1');
+      const emailEl = document.getElementById('email_1');
+      if (companyEl && !companyEl.value) companyEl.value = currentManufacturer.full_name || '';
+      if (crnEl && !crnEl.value) crnEl.value = currentManufacturer.username || '';
+      if (phoneEl && !phoneEl.value) phoneEl.value = currentManufacturer.password_hash || '';
+      if (emailEl && !emailEl.value) emailEl.value = currentManufacturer.email || '';
+    }, 100);
+  }
 }
 function closeForm() {
   if (currentManufacturer) { showView('manufacturerView'); refreshManufacturerDashboard(); }
