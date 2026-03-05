@@ -487,27 +487,17 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
       <div class="card-header">
         <div class="card-header-icon">📋</div>
         <div>
-          <h2>نوع التسجيل</h2>
-          <p>اختر طريقة تسجيل السلعة المناسبة</p>
+          <h2>تسجيل السلع</h2>
+          <p>سجّل سلعة واحدة أو أكثر في طلب واحد</p>
         </div>
       </div>
       <div class="card-body">
         <div class="type-toggle">
-          <label class="type-btn selected" id="single-btn">
-            <input type="radio" name="regType" value="single" checked onchange="selectType('single')">
+          <label class="type-btn selected" style="flex:1;cursor:default">
             <span class="type-icon">📦</span>
-            <span>تسجيل سلعة مفردة</span>
-            <small style="font-size:12px; font-weight:400; color:var(--muted); margin-top:4px;">تسجيل منتج واحد</small>
+            <span>تسجيل السلع</span>
+            <small style="font-size:12px;font-weight:400;color:var(--muted);margin-top:4px">يمكنك إضافة سلعة واحدة أو أكثر في نفس الطلب</small>
           </label>
-          <label class="type-btn" id="multi-btn">
-            <input type="radio" name="regType" value="multiple" onchange="selectType('multiple')">
-            <span class="type-icon">📦📦</span>
-            <span>تسجيل سلع متعددة</span>
-            <small style="font-size:12px; font-weight:400; color:var(--muted); margin-top:4px;">تسجيل أكثر من منتج</small>
-          </label>
-        </div>
-        <div id="multi-note" style="display:none; margin-top:16px; padding:14px 16px; background:#fff8e8; border:1px solid #f0d080; border-radius:10px; font-size:13px; color:#8a6c00; border-right:3px solid var(--accent);">
-          <strong>ملاحظة:</strong> لتسجيل سلع متعددة، يمكنك تكرار هذا النموذج لكل سلعة، أو رفع ملف Excel يحتوي على بيانات جميع السلع.
         </div>
       </div>
     </div>
@@ -980,7 +970,7 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
   /* Toggle type */
   .type-toggle {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 12px;
     margin-bottom: 4px;
   }
@@ -1358,7 +1348,7 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
   @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }
     .field-full { grid-column: 1; }
-    .type-toggle { grid-template-columns: 1fr 1fr; }
+    .type-toggle { grid-template-columns: 1fr; }
     .project-grid { grid-template-columns: repeat(2,1fr); }
     .header-inner { flex-direction: column; text-align: center; }
     .header-text h1 { font-size: 22px; }
@@ -1378,6 +1368,14 @@ function goToPage(n) {
   document.getElementById('page' + n).classList.add('active');
   currentPage = n;
   updateSteps();
+  // When navigating to page 2, ensure at least one card exists (preserve existing cards)
+  if (n === 2) {
+    const container = document.getElementById('productsContainer');
+    if (!container.hasChildNodes()) {
+      productCount = 0;
+      addProduct();
+    }
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1427,8 +1425,8 @@ function govOptions() {
 
 function buildProductCard(index, canRemove) {
   const id = index;
-  const label = isMultiMode ? `السلعة ${index}` : 'بيانات السلعة والشركة';
-  const icon = isMultiMode ? `📦` : `🏷️`;
+  const label = `السلعة ${index}`;
+  const icon = `📦`;
   const removeBtn = canRemove
     ? `<button class="btn-remove-product" onclick="removeProduct(${id})">✕ حذف</button>`
     : '';
@@ -1443,15 +1441,15 @@ function buildProductCard(index, canRemove) {
       <div class="form-grid">
         <div class="field field-full">
           <label>اسم السلعة <span class="req">*</span></label>
-          <input type="text" placeholder="أدخل اسم السلعة أو المنتج" required>
+          <input id="productName_${id}" type="text" placeholder="أدخل اسم السلعة أو المنتج" required>
         </div>
         <div class="field">
           <label>اسم الشركة المصنعة <span class="req">*</span></label>
-          <input type="text" placeholder="اسم الشركة المصنعة" required>
+          <input id="company_${id}" type="text" placeholder="اسم الشركة المصنعة" required>
         </div>
         <div class="field">
           <label>رقم السجل التجاري <span class="req">*</span></label>
-          <input type="text" placeholder="أدخل رقم السجل التجاري" required>
+          <input id="crn_${id}" type="text" placeholder="أدخل رقم السجل التجاري" required>
         </div>
         <div class="field">
           <label>محافظة المصنع <span class="req">*</span></label>
@@ -1467,11 +1465,11 @@ function buildProductCard(index, canRemove) {
         </div>
         <div class="field">
           <label>رقم التواصل <span class="req">*</span></label>
-          <input type="tel" placeholder="9XXXXXXX+" dir="ltr" style="text-align:right" required>
+          <input id="phone_${id}" type="tel" placeholder="9XXXXXXX+" dir="ltr" style="text-align:right" required>
         </div>
         <div class="field">
           <label>البريد الإلكتروني <span class="req">*</span></label>
-          <input type="email" placeholder="example@company.com" dir="ltr" style="text-align:right" required>
+          <input id="email_${id}" type="email" placeholder="example@company.com" dir="ltr" style="text-align:right" required>
         </div>
       </div>
 
@@ -1553,6 +1551,30 @@ function addProduct() {
   const div = document.createElement('div');
   div.innerHTML = buildProductCard(productCount, productCount > 1);
   container.appendChild(div.firstElementChild);
+
+  // Auto-fill company info from first card if adding card 2+
+  if (productCount > 1) {
+    const fields = ['company','crn','phone','email'];
+    fields.forEach(f => {
+      const src = document.getElementById(`${f}_1`);
+      const dst = document.getElementById(`${f}_${productCount}`);
+      if (src && dst && src.value) dst.value = src.value;
+    });
+    // Auto-fill governorate
+    const srcGov = document.getElementById('govSelect_1');
+    const dstGov = document.getElementById(`govSelect_${productCount}`);
+    if (srcGov && dstGov && srcGov.value) {
+      dstGov.value = srcGov.value;
+      onGovChange(productCount);
+      // Auto-fill wilaya after options populated
+      setTimeout(() => {
+        const srcWil = document.getElementById('wilayaSelect_1');
+        const dstWil = document.getElementById(`wilayaSelect_${productCount}`);
+        if (srcWil && dstWil && srcWil.value) dstWil.value = srcWil.value;
+      }, 50);
+    }
+  }
+
   // scroll to new card
   document.getElementById(`productCard_${productCount}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -1569,17 +1591,7 @@ function removeProduct(id) {
 }
 
 function selectType(type) {
-  isMultiMode = type === 'multiple';
-  document.getElementById('single-btn').classList.toggle('selected', !isMultiMode);
-  document.getElementById('multi-btn').classList.toggle('selected', isMultiMode);
-  document.getElementById('multi-note').style.display = isMultiMode ? 'block' : 'none';
-  document.getElementById('addProductWrap').style.display = isMultiMode ? 'block' : 'none';
-
-  // Rebuild products container
-  const container = document.getElementById('productsContainer');
-  container.innerHTML = '';
-  productCount = 0;
-  addProduct(); // always add first card
+  // Always multi mode now - no-op kept for compatibility
 }
 
 function onGovChange(id) {
@@ -1595,8 +1607,9 @@ function onGovChange(id) {
 
 // Init first product card on load
 window.addEventListener('DOMContentLoaded', () => {
-  isMultiMode = false;
-  addProduct();
+  isMultiMode = true;
+  document.getElementById('addProductWrap').style.display = 'block';
+  // Don't add product card on load - wait for user to go to page 2
 });
 
 function selectRadio(el, name, optsId, uploadId) {
@@ -1777,10 +1790,10 @@ function printPage() {
 window.platformSubmitHandler = function(data) {
   platformOnSubmit(data);
 };
-// Init form on load
+// Init form on load - cards are created when user navigates to page 2
 (function() {
-  isMultiMode = false;
-  addProduct();
+  isMultiMode = true;
+  document.getElementById('addProductWrap').style.display = 'block';
 })();
 </script>
 
@@ -2050,8 +2063,17 @@ function updateSidebarUser() {
 }
 
 function doLogout() {
-  currentUser = null;
-  showView('landingView');
+  showConfirm({
+    icon: '🚪',
+    title: 'تسجيل الخروج',
+    msg: 'هل تريد تسجيل الخروج من لوحة التحكم؟',
+    okLabel: 'تسجيل الخروج',
+    okColor: '#1a3a5c',
+    onOk: () => {
+      currentUser = null;
+      showView('landingView');
+    }
+  });
 }
 
 // ============================================================
@@ -2398,9 +2420,10 @@ async function changeStatus(id, status) {
   try {
     await sbPatch('requests', id, { status, updated_at: new Date().toISOString() });
 
-    // إرسال إيميل عند القبول
-    if (status === 'approved' && r.email) {
-      await sendApprovalEmail(r);
+    // إرسال إيميل عند القبول أو الرفض
+    if ((status === 'approved' || status === 'rejected') && r.email) {
+      if (status === 'approved') await sendApprovalEmail(r);
+      else await sendRejectionEmail(r);
     }
 
     refreshAdmin();
@@ -2435,12 +2458,43 @@ async function sendApprovalEmail(r) {
   showEmailModal(r, email, subject, body);
 }
 
-function showEmailModal(r, email, subject, body) {
+async function sendRejectionEmail(r) {
+  const email = r.email;
+  if (!email) return;
+
+  const subject = encodeURIComponent('نظام القائمة الاسترشادية الإلكتروني — اعتذار بشأن طلبك');
+  const body = encodeURIComponent(
+    `السلام عليكم ورحمة الله وبركاته،\n\n` +
+    `نشكركم على تقديم طلب تسجيل منتجكم في القائمة الاسترشادية الإلكترونية.\n\n` +
+    `نأسف لإبلاغكم بأنه بعد مراجعة طلبكم، تقرر رفض التسجيل في الوقت الحالي.\n\n` +
+    `تفاصيل الطلب المرفوض:\n` +
+    `رقم الطلب: ${r.ref_num || r.refNum}\n` +
+    `اسم السلعة: ${r.product_name || r.productName}\n` +
+    `الشركة المصنعة: ${r.company}\n\n` +
+    `يمكنكم التواصل معنا لمزيد من التوضيح أو إعادة تقديم الطلب بعد استيفاء المتطلبات.\n\n` +
+    `مع تحيات هيئة المشاريع والمناقصات والمحتوى المحلي`
+  );
+
+  showEmailModal(r, email, subject, body, 'rejected');
+}
+
+function showEmailModal(r, email, subject, body, type='approved') {
   const modal = document.getElementById('emailModal');
   document.getElementById('emailModalTo').textContent    = email;
   document.getElementById('emailModalSubject').textContent = decodeURIComponent(subject);
   document.getElementById('emailModalBody').textContent  = decodeURIComponent(body);
   document.getElementById('emailMailtoBtn').href = `mailto:${email}?subject=${subject}&body=${body}`;
+  // Update header color based on type
+  const header = document.getElementById('emailModalHeader');
+  if (header) {
+    if (type === 'rejected') {
+      header.style.background = 'linear-gradient(135deg,#ef4444,#f87171)';
+      header.querySelector('span').textContent = '📧 إشعار رفض الطلب';
+    } else {
+      header.style.background = 'linear-gradient(135deg,var(--success),#34d399)';
+      header.querySelector('span').textContent = '📧 إشعار قبول الطلب';
+    }
+  }
   modal.classList.add('open');
 }
 
@@ -2839,22 +2893,22 @@ CREATE POLICY \"allow_read_attachments\" ON storage.objects
 
 <!-- Email Confirmation Modal -->
 <div class="modal-overlay" id="emailModal">
-  <div class="login-modal" style="width:520px;max-width:95vw">
-    <button class="modal-close" onclick="document.getElementById('emailModal').classList.remove('open')">✕</button>
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:36px">✅</div>
-      <div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--success);margin-top:8px">تم قبول الطلب</div>
-      <div style="font-size:13px;color:var(--muted);margin-top:4px">سيتم إرسال إشعار بالقبول إلى المتقدم</div>
+  <div class="login-modal" style="width:520px;max-width:95vw;padding:0;overflow:hidden;border-radius:20px">
+    <div id="emailModalHeader" style="background:linear-gradient(135deg,var(--success),#34d399);padding:20px 24px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;color:#fff">📧 إشعار قبول الطلب</span>
+      <button onclick="document.getElementById('emailModal').classList.remove('open')" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
     </div>
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-bottom:16px">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">إلى:</div>
-      <div style="font-size:14px;font-weight:700;color:var(--text);direction:ltr" id="emailModalTo"></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:10px;margin-bottom:4px">الموضوع:</div>
-      <div style="font-size:13px;color:var(--text)" id="emailModalSubject"></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:10px;margin-bottom:4px">نص الرسالة:</div>
-      <div style="font-size:12px;color:var(--text);line-height:1.8;white-space:pre-line" id="emailModalBody"></div>
+    <div style="padding:20px 24px">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">إلى:</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);direction:ltr" id="emailModalTo"></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:10px;margin-bottom:4px">الموضوع:</div>
+        <div style="font-size:13px;color:var(--text);font-weight:600" id="emailModalSubject"></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:10px;margin-bottom:4px">نص الرسالة:</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.8;white-space:pre-line" id="emailModalBody"></div>
+      </div>
+      <a id="emailMailtoBtn" href="#" class="btn-login" style="display:block;text-align:center;text-decoration:none" onclick="document.getElementById('emailModal').classList.remove('open')">📧 فتح برنامج البريد وإرسال</a>
     </div>
-    <a id="emailMailtoBtn" href="#" class="btn-login" style="display:block;text-align:center;text-decoration:none" onclick="document.getElementById('emailModal').classList.remove('open')">📧 فتح برنامج البريد وإرسال</a>
   </div>
 </div>
 
