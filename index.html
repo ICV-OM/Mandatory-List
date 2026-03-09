@@ -292,10 +292,10 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
       <div>
         <div class="hero-badge">🇴🇲 هيئة المشاريع والمناقصات والمحتوى المحلي</div>
         <h1 class="hero-title">قائمة<br><em>المنتجات</em><br>الوطنية</h1>
-        <p class="hero-desc">منصة رقمية متكاملة لتسجيل المنتجات في القائمة الإلزامية لمشاريع سلطنة عُمان. دعم المحتوى المحلي وتعزيز الصناعة الوطنية.</p>
+        <p class="hero-desc">منصة رقمية متكاملة لتسجيل المنتجات في قائمة المنتجات الوطنية لمشاريع سلطنة عُمان. دعم المحتوى المحلي وتعزيز الصناعة الوطنية.</p>
         <div class="hero-actions">
           <button class="btn-hero-primary" onclick="openManufacturerLogin()">📋 سجّل منتجك الآن</button>
-          <button class="btn-hero-primary" onclick="openContractorLogin()" style="background:linear-gradient(135deg,#059669,#34d399);box-shadow:0 8px 24px rgba(5,150,105,0.4)">🏗️ شراء سلعة من القائمة الإلزامية</button>
+          <button class="btn-hero-primary" onclick="openContractorLogin()" style="background:linear-gradient(135deg,#059669,#34d399);box-shadow:0 8px 24px rgba(5,150,105,0.4)">🏗️ شراء سلعة من قائمة المنتجات الوطنية</button>
           <button class="btn-hero-secondary" onclick="scrollSec('#how-sec')">كيف يعمل النظام؟</button>
         </div>
       </div>
@@ -339,7 +339,7 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
     <div class="pub-dash-inner">
       <div class="section-tag" style="color:var(--accent-light)">📊 الإحصائيات العامة</div>
       <h2 class="section-title" style="color:#fff">لوحة المعلومات العامة</h2>
-      <p class="section-sub" style="color:rgba(255,255,255,.6)">بيانات محدّثة عن المنتجات المسجلة وحالة الاعتمادات في القائمة الإلزامية</p>
+      <p class="section-sub" style="color:rgba(255,255,255,.6)">بيانات محدّثة عن المنتجات المسجلة وحالة الاعتمادات في قائمة المنتجات الوطنية</p>
       <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-num" id="pub-kpi-total">٠</div><div class="kpi-label">إجمالي طلبات التسجيل</div><div class="kpi-trend" id="pub-kpi-total-trend"></div></div>
         <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-num" id="pub-kpi-approved">٠</div><div class="kpi-label">منتجات معتمدة</div><div class="kpi-trend" id="pub-kpi-approved-trend"></div></div>
@@ -367,7 +367,7 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
   <div id="features-sec">
     <div class="section">
       <div class="section-tag">⭐ المميزات</div>
-      <h2 class="section-title">لماذا نظام القائمة الاسترشادية؟</h2>
+      <h2 class="section-title">لماذا نظام قائمة المنتجات الوطنية؟</h2>
       <p class="section-sub">نظام متكامل يُبسّط عملية تسجيل المنتجات ويضمن الشفافية والكفاءة</p>
       <div class="features-grid">
         <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">تسجيل رقمي سهل</div><div class="feat-desc">واجهة عربية بالكامل مع دعم رفع المستندات والمرفقات بكل سهولة</div></div>
@@ -397,7 +397,7 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
   <!-- CTA -->
   <div style="background:linear-gradient(135deg,var(--primary),var(--primary-light));padding:80px 40px;text-align:center">
     <div style="font-size:13px;color:var(--accent-light);font-weight:700;letter-spacing:2px;margin-bottom:16px">ابدأ الآن</div>
-    <h2 style="font-family:'Cairo',sans-serif;font-size:36px;font-weight:900;color:#fff;margin-bottom:16px">سجّل منتجك في القائمة الإلزامية</h2>
+    <h2 style="font-family:'Cairo',sans-serif;font-size:36px;font-weight:900;color:#fff;margin-bottom:16px">سجّل منتجك في قائمة المنتجات الوطنية</h2>
     <p style="color:rgba(255,255,255,.65);font-size:15px;margin-bottom:32px">انضم إلى الشركات العُمانية المعتمدة في منصة إسناد</p>
     <button class="btn-hero-primary" onclick="openManufacturerLogin()" style="margin:0 auto;display:inline-flex">📋 ابدأ التسجيل مجاناً ←</button>
   </div>
@@ -428,14 +428,14 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
 <div class="view" id="formView">
   <div class="form-topbar">
     <button onclick="closeForm()">← العودة</button>
-    <span style="color:rgba(255,255,255,.7);font-size:14px;font-weight:600">التسجيل في القائمة الإلزامية للمنتجات</span>
+    <span style="color:rgba(255,255,255,.7);font-size:14px;font-weight:600">التسجيل في قائمة المنتجات الوطنية</span>
   </div>
   <div id="formContainer">
 <div class="page-header">
   <div class="header-inner">
     <div class="header-icon">🏭</div>
     <div class="header-text">
-      <h1>التسجيل في القائمة الإلزامية</h1>
+      <h1>التسجيل في قائمة المنتجات الوطنية</h1>
       <p>البيانات المطلوبة لتسجيل سلعة من خلال منصة إسناد</p>
       <span class="header-badge">مفتوح للتسجيل</span>
     </div>
@@ -1799,7 +1799,7 @@ window.platformSubmitHandler = function(data) {
     <nav class="sidebar">
       <div class="sidebar-brand">
         <div class="sidebar-brand-icon">🏛️</div>
-        <div><div class="sidebar-brand-name" id="sidebarBrandName" onclick="openRenameBrand()" title="اضغط لتغيير الاسم" style="cursor:pointer">القائمة الاسترشادية</div><div class="sidebar-brand-sub" id="sidebarBrandSub">نظام إدارة الطلبات</div></div>
+        <div><div class="sidebar-brand-name" id="sidebarBrandName" onclick="openRenameBrand()" title="اضغط لتغيير الاسم" style="cursor:pointer">قائمة المنتجات الوطنية</div><div class="sidebar-brand-sub" id="sidebarBrandSub">نظام إدارة الطلبات</div></div>
       </div>
       <div class="sidebar-menu">
         <div class="sidebar-section-label">الرئيسية</div>
@@ -2538,10 +2538,10 @@ async function sendApprovalEmail(r) {
   // Since we don't have an Edge Function deployed, we'll use a mailto link as visual feedback
   // In production, replace with actual Edge Function call
 
-  const subject = encodeURIComponent('نظام القائمة الاسترشادية الإلكتروني — اعتماد طلبك');
+  const subject = encodeURIComponent('نظام قائمة المنتجات الوطنية — اعتماد طلبك');
   const body = encodeURIComponent(
     `السلام عليكم ورحمة الله وبركاته،\n\n` +
-    `يسعدنا إشعاركم بأنه تم اعتماد طلب تسجيل منتجكم في القائمة الاسترشادية الإلكترونية.\n\n` +
+    `يسعدنا إشعاركم بأنه تم اعتماد طلب تسجيل منتجكم في قائمة المنتجات الوطنية الإلكترونية.\n\n` +
     `تفاصيل الطلب:\n` +
     `رقم الطلب: ${r.ref_num || r.refNum}\n` +
     `اسم السلعة: ${r.product_name || r.productName}\n` +
@@ -2557,10 +2557,10 @@ async function sendRejectionEmail(r) {
   const email = r.email;
   if (!email) return;
 
-  const subject = encodeURIComponent('نظام القائمة الاسترشادية الإلكتروني — اعتذار بشأن طلبك');
+  const subject = encodeURIComponent('نظام قائمة المنتجات الوطنية الإلكتروني — اعتذار بشأن طلبك');
   const body = encodeURIComponent(
     `السلام عليكم ورحمة الله وبركاته،\n\n` +
-    `نشكركم على تقديم طلب تسجيل منتجكم في القائمة الاسترشادية الإلكترونية.\n\n` +
+    `نشكركم على تقديم طلب تسجيل منتجكم في قائمة المنتجات الوطنية الإلكترونية.\n\n` +
     `نأسف لإبلاغكم بأنه بعد مراجعة طلبكم، تقرر رفض التسجيل في الوقت الحالي.\n\n` +
     `تفاصيل الطلب المرفوض:\n` +
     `رقم الطلب: ${r.ref_num || r.refNum}\n` +
@@ -3863,7 +3863,7 @@ function doMfgLogout() {
         <!-- PRODUCTS -->
         <div class="admin-section" id="sec-con-products">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-            <div><div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary)">📦 السلع المتاحة في القائمة الإلزامية</div><div style="font-size:13px;color:var(--muted);margin-top:4px">اختر السلع وحدد المبلغ بالريال العماني</div></div>
+            <div><div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary)">📦 السلع المتاحة في قائمة المنتجات الوطنية</div><div style="font-size:13px;color:var(--muted);margin-top:4px">اختر السلع وحدد المبلغ بالريال العماني</div></div>
             <input class="tbl-search" placeholder="🔍 بحث..." oninput="filterContractorProducts(this.value)" style="width:250px">
           </div>
           <div class="tbl-card"><div style="overflow-x:auto"><table id="conProductsTable"><thead><tr>
@@ -3997,7 +3997,7 @@ function doMfgLogout() {
             <div class="akpi akpi-red"><div class="akpi-icon">💰</div><div class="akpi-num" id="mfg-kpi-amount">0</div><div class="akpi-lbl">إجمالي المبالغ (ر.ع)</div></div>
           </div>
           <div style="margin-top:24px;display:flex;gap:16px;flex-wrap:wrap">
-            <button class="btn-hero-primary" onclick="openForm()" style="font-size:15px">📋 تسجيل سلعة جديدة في القائمة الإلزامية</button>
+            <button class="btn-hero-primary" onclick="openForm()" style="font-size:15px">📋 تسجيل سلعة جديدة في قائمة المنتجات الوطنية</button>
             <button class="btn-hero-secondary" onclick="showMfgSec('mfg-orders',document.querySelectorAll('#manufacturerView .sidebar-item')[2])" style="color:var(--text);border-color:var(--border);font-size:15px">🔔 عرض طلبات الشراء الواردة</button>
           </div>
         </div>
@@ -4010,7 +4010,7 @@ function doMfgLogout() {
         <!-- MFG MY PRODUCTS -->
         <div class="admin-section" id="sec-mfg-products">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-            <div><div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary)">📦 سلعي المسجلة في القائمة الإلزامية</div><div style="font-size:13px;color:var(--muted);margin-top:4px">جميع السلع التي قمت بتسجيلها وحالتها</div></div>
+            <div><div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary)">📦 سلعي المسجلة في قائمة المنتجات الوطنية</div><div style="font-size:13px;color:var(--muted);margin-top:4px">جميع السلع التي قمت بتسجيلها وحالتها</div></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <input class="tbl-search" placeholder="🔍 بحث..." oninput="filterMfgProducts(this.value)" style="width:200px">
               <button class="btn-excel" onclick="exportMfgProductsExcel()">📊 تصدير Excel</button>
@@ -4261,7 +4261,7 @@ function copySQL() {
     <div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary);margin-bottom:20px">✏️ تغيير اسم النظام</div>
     <div class="login-field">
       <label>اسم النظام في الشريط الجانبي</label>
-      <input type="text" id="newBrandName" placeholder="مثال: القائمة الاسترشادية">
+      <input type="text" id="newBrandName" placeholder="مثال: قائمة المنتجات الوطنية">
     </div>
     <div class="login-field">
       <label>العنوان الفرعي</label>
