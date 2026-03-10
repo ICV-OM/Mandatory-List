@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نظام قائمة المنتجات الوطنية</title>
+<title>نظام قائمة المنتجات الوطنية الإلكتروني</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -181,12 +181,12 @@ body { font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text)
 .sidebar-avatar { width:36px; height:36px; border-radius:50%; background:rgba(200,144,46,0.3); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
 .sidebar-user-name { font-size:13px; font-weight:600; color:#fff; }
 .sidebar-user-role { font-size:11px; color:rgba(255,255,255,.4); }
-.admin-main { margin-right:var(--sidebar-w); flex:1; min-height:100vh; }
+.admin-main { margin-right:var(--sidebar-w); flex:1; min-height:100vh; max-width:calc(100vw - var(--sidebar-w)); overflow-x:hidden; }
 .admin-topbar { position:sticky; top:0; z-index:700; background:rgba(255,255,255,0.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); padding:0 32px; height:62px; display:flex; align-items:center; justify-content:space-between; }
 .topbar-title { font-size:16px; font-weight:800; color:var(--primary); font-family:'Cairo',sans-serif; }
 .btn-logout { padding:7px 16px; border-radius:8px; border:1.5px solid var(--border); background:#fff; color:var(--muted); font-family:'Tajawal',sans-serif; font-size:13px; cursor:pointer; transition:all .2s; }
 .btn-logout:hover { border-color:var(--danger); color:var(--danger); }
-.admin-content { padding:28px 32px; }
+.admin-content { padding:28px 32px; overflow-x:auto; }
 .admin-section { display:none; }
 .admin-section.active { display:block; }
 
@@ -216,6 +216,11 @@ body { font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text)
 
 /* Table */
 .tbl-card { background:var(--card); border-radius:16px; border:1px solid var(--border); overflow:hidden; }
+.tbl-card > div { overflow-x:auto; scrollbar-width:thin; scrollbar-color:var(--primary-light) #f1f5f9; }
+.tbl-card > div::-webkit-scrollbar { height:10px; }
+.tbl-card > div::-webkit-scrollbar-track { background:#f1f5f9;border-radius:5px; }
+.tbl-card > div::-webkit-scrollbar-thumb { background:var(--primary-light);border-radius:5px; }
+.tbl-card > div::-webkit-scrollbar-thumb:hover { background:var(--primary); }
 .tbl-header { padding:18px 22px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
 .tbl-title { font-size:15px; font-weight:800; color:var(--primary); font-family:'Cairo',sans-serif; }
 .tbl-tools { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
@@ -231,6 +236,8 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
 .badge-pending { background:#fef3c7; color:#92400e; }
 .badge-approved { background:#d1fae5; color:#065f46; }
 .badge-rejected { background:#fee2e2; color:#991b1b; }
+.badge-modification { background:#dbeafe; color:#1e40af; }
+.badge-partial { background:#fef3c7; color:#92400e; }
 .badge-review { background:#dbeafe; color:#1e40af; }
 .tbl-btn { padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; border:none; cursor:pointer; font-family:'Tajawal',sans-serif; transition:all .15s; margin-left:3px; }
 .tbl-btn-view { background:#eff6ff; color:var(--info); }
@@ -402,7 +409,8 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
     <button class="btn-hero-primary" onclick="openManufacturerLogin()" style="margin:0 auto;display:inline-flex">📋 ابدأ التسجيل مجاناً ←</button>
   </div>
 
-  <footer style="background:var(--primary);padding:28px 40px;text-align:center;border-top:1px solid rgba(255,255,255,.08)">
+  <footer style="background:var(--primary);padding:28px 40px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <button onclick="openComplaintModal()" style="background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:#fff;padding:14px 36px;border-radius:12px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(239,68,68,0.4)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(239,68,68,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(239,68,68,0.4)'">📝 تقديم شكوى</button>
     <div style="color:rgba(255,255,255,.4);font-size:13px">© 2025 هيئة المشاريع والمناقصات والمحتوى المحلي — سلطنة عُمان</div>
   </footer>
 </div>
@@ -428,7 +436,7 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
 <div class="view" id="formView">
   <div class="form-topbar">
     <button onclick="closeForm()">← العودة</button>
-    <span style="color:rgba(255,255,255,.7);font-size:14px;font-weight:600">التسجيل في قائمة المنتجات الوطنية</span>
+    <span style="color:rgba(255,255,255,.7);font-size:14px;font-weight:600">التسجيل في قائمة المنتجات الوطنية للمنتجات</span>
   </div>
   <div id="formContainer">
 <div class="page-header">
@@ -537,57 +545,67 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
       </div>
       <div class="card-body">
         <div class="project-grid" id="projectGrid">
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع بناء وتجهيز المدارس والمرافق التعليمية — مثال: مشروع بناء مدرسة حكومية">
             <input type="checkbox" value="schools" onchange="handleChip(this)">
             <span class="chip-icon">🏫</span> مدارس
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع بناء وتجهيز المستشفيات والمراكز الصحية — مثال: مشروع إنشاء مستشفى مرجعي">
             <input type="checkbox" value="hospitals" onchange="handleChip(this)">
             <span class="chip-icon">🏥</span> مستشفيات
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع بناء المباني الحكومية والتجارية والسكنية — مثال: مشروع مبنى وزاري أو مجمع تجاري">
             <input type="checkbox" value="buildings" onchange="handleChip(this)">
             <span class="chip-icon">🏢</span> مباني
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع التموين الغذائي والإعاشة — مثال: عقود توريد أغذية للمؤسسات الحكومية">
             <input type="checkbox" value="food" onchange="handleChip(this)">
             <span class="chip-icon">🍽️</span> التموين
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع إنشاء وصيانة الطرق والجسور — مثال: مشروع طريق سريع بين المحافظات">
             <input type="checkbox" value="roads" onchange="handleChip(this)">
             <span class="chip-icon">🛣️</span> الطرق والجسور
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع إنشاء السدود وتخزين المياه — مثال: مشروع سد وادي ضيقة">
             <input type="checkbox" value="dams" onchange="handleChip(this)">
             <span class="chip-icon">🏞️</span> السدود
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع إنشاء وتطوير الموانئ البحرية — مثال: مشروع ميناء الدقم أو صحار">
             <input type="checkbox" value="ports" onchange="handleChip(this)">
             <span class="chip-icon">⚓</span> الموانئ
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع إنشاء خطوط السكك الحديدية والقطارات — مثال: مشروع سكة حديد عُمان الإمارات">
             <input type="checkbox" value="railways" onchange="handleChip(this)">
             <span class="chip-icon">🚆</span> السكك الحديدية
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع توريد أجهزة الحاسوب والمعدات التقنية — مثال: عقد توريد حواسيب لجهة حكومية">
             <input type="checkbox" value="tech" onchange="handleChip(this)">
             <span class="chip-icon">💻</span> الحواسيب والمعدات
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip">
+          <label class="project-chip" title="مشاريع صناعة البتروكيماويات والمصافي — مثال: مشروع مصفاة الدقم">
             <input type="checkbox" value="petro" onchange="handleChip(this)">
             <span class="chip-icon">🛢️</span> البترولية والكيماوية
             <span class="chip-check">✓</span>
           </label>
-          <label class="project-chip" id="other-chip">
+          <label class="project-chip" title="عقود المقاولات العامة بمختلف أنواعها — مثال: عقد مقاولات إنشائية لمشروع حكومي">
+            <input type="checkbox" value="contracts" onchange="handleChip(this)">
+            <span class="chip-icon">📝</span> العقود
+            <span class="chip-check">✓</span>
+          </label>
+          <label class="project-chip" title="مشاريع إدارة وتشغيل وصيانة المرافق العامة والخاصة — مثال: عقد إدارة مرافق مجمع حكومي">
+            <input type="checkbox" value="facilities" onchange="handleChip(this)">
+            <span class="chip-icon">🏗️</span> إدارة المرافق
+            <span class="chip-check">✓</span>
+          </label>
+          <label class="project-chip" id="other-chip" title="أنواع مشاريع أخرى غير مدرجة في القائمة">
             <input type="checkbox" value="other" onchange="handleChip(this, 'other-input')">
             <span class="chip-icon">➕</span> آخرى
             <span class="chip-check">✓</span>
@@ -641,11 +659,12 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
           <label class="project-chip"><input type="checkbox" value="mocs" onchange="handleChip(this)"><span class="chip-icon">🎭</span> وزارة الثقافة والرياضة والشباب<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="moti" onchange="handleChip(this)"><span class="chip-icon">🏕️</span> وزارة التراث والسياحة<span class="chip-check">✓</span></label>
           <!-- الهيئات والمؤسسات -->
-          <label class="project-chip"><input type="checkbox" value="ptlca" onchange="handleChip(this)"><span class="chip-icon">📋</span> هيئة المناقصات والمحتوى المحلي<span class="chip-check">✓</span></label>
+          <label class="project-chip"><input type="checkbox" value="ptlca" onchange="handleChip(this)"><span class="chip-icon">📋</span> هيئة المشاريع والمناقصات والمحتوى المحلي<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="caa" onchange="handleChip(this)"><span class="chip-icon">✈️</span> هيئة الطيران المدني<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="era" onchange="handleChip(this)"><span class="chip-icon">⚡</span> هيئة تنظيم الخدمات العامة<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="cma" onchange="handleChip(this)"><span class="chip-icon">📈</span> هيئة أسواق المال<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="ita" onchange="handleChip(this)"><span class="chip-icon">🏭</span> هيئة تنمية المؤسسات الصغيرة والمتوسطة<span class="chip-check">✓</span></label>
+          <label class="project-chip"><input type="checkbox" value="ea" onchange="handleChip(this)"><span class="chip-icon">🌿</span> هيئة البيئة<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="ncsi" onchange="handleChip(this)"><span class="chip-icon">📊</span> المركز الوطني للإحصاء والمعلومات<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="omanrail" onchange="handleChip(this)"><span class="chip-icon">🚆</span> الهيئة العُمانية للسكك الحديدية<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="oab" onchange="handleChip(this)"><span class="chip-icon">🏦</span> البنك المركزي العُماني<span class="chip-check">✓</span></label>
@@ -659,6 +678,7 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
           <label class="project-chip"><input type="checkbox" value="psc" onchange="handleChip(this)"><span class="chip-icon">🔧</span> هيئة الخدمات العامة<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="oman_air" onchange="handleChip(this)"><span class="chip-icon">✈️</span> الطيران العُماني<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="banka" onchange="handleChip(this)"><span class="chip-icon">🏦</span> بنك التنمية<span class="chip-check">✓</span></label>
+          <label class="project-chip"><input type="checkbox" value="ohb" onchange="handleChip(this)"><span class="chip-icon">🏦</span> بنك الإسكان العُماني<span class="chip-check">✓</span></label>
           <!-- المحافظات -->
           <label class="project-chip"><input type="checkbox" value="gov_muscat" onchange="handleChip(this)"><span class="chip-icon">🗺️</span> محافظة مسقط<span class="chip-check">✓</span></label>
           <label class="project-chip"><input type="checkbox" value="gov_dhofar" onchange="handleChip(this)"><span class="chip-icon">🗺️</span> محافظة ظفار<span class="chip-check">✓</span></label>
@@ -725,6 +745,10 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
           <div class="condition-item">
             <div class="condition-num">٦</div>
             <div>يحق للهيئة استبعاد السلعة المسجلة وحرمان الشركة لفترة محددة إذا أخلت بالشروط المذكورة أو المتفق عليها في بنود عقد التوريد.</div>
+          </div>
+          <div class="condition-item">
+            <div class="condition-num">٧</div>
+            <div>مدة سريان التسجيل في قائمة المنتجات الوطنية <strong>سنة واحدة</strong> من تاريخ الاعتماد، ويتطلب التجديد بعد انتهائها.</div>
           </div>
         </div>
 
@@ -1100,6 +1124,7 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
     font-size: 11px;
     transition: all 0.15s;
     background: #fff;
+    color: transparent;
   }
   .project-chip.checked .chip-check {
     background: var(--primary);
@@ -1182,6 +1207,7 @@ tbody td { padding:10px 14px; color:var(--text); vertical-align:middle; }
     display: flex; align-items: center; justify-content: center;
     font-size: 14px;
     transition: all 0.2s;
+    color: transparent;
   }
   .agree-box.checked .check-box { background: var(--success); border-color: var(--success); color: #fff; }
 
@@ -1487,15 +1513,10 @@ function buildProductCard(index, canRemove) {
         </div>
         <div class="field">
           <label>هوية المنتج الوطني</label>
-          <div class="radio-options" id="national-opts_${id}">
-            <label class="radio-opt" onclick="selectRadio(this,'national_${id}','national-opts_${id}','national-upload_${id}')">
-              <input type="radio" name="national_${id}" value="yes">
-              <div class="radio-dot"></div> نعم
-            </label>
-            <label class="radio-opt" onclick="selectRadio(this,'national_${id}','national-opts_${id}','national-upload_${id}')">
-              <input type="radio" name="national_${id}" value="no">
-              <div class="radio-dot"></div> لا
-            </label>
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#f0fdf4;border:2px solid #bbf7d0;border-radius:10px">
+            <span style="font-size:18px">✅</span>
+            <span style="font-weight:700;color:#059669;font-size:14px">نعم — منتج وطني</span>
+            <input type="radio" name="national_${id}" value="yes" checked style="display:none">
           </div>
         </div>
         <div class="field" id="riada-upload_${id}" style="display:none">
@@ -1507,8 +1528,12 @@ function buildProductCard(index, canRemove) {
             <div class="upload-hint">PDF, JPG, PNG (حتى 5 ميجا)</div>
             <div class="file-name" id="fname_r${id}"></div>
           </div>
+          <div style="margin-top:10px">
+            <label>تاريخ انتهاء شهادة ريادة</label>
+            <input type="date" id="riadaExpiry_${id}" style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;direction:ltr">
+          </div>
         </div>
-        <div class="field" id="national-upload_${id}" style="display:none">
+        <div class="field" id="national-upload_${id}">
           <label>إرفاق مستند هوية المنتج الوطني <span class="opt">أو رابط منصة صنع في عُمان</span></label>
           <div class="upload-zone" id="uzone_n${id}">
             <input type="file" accept=".pdf,.jpg,.png" onchange="handleFile(this,'uzone_n${id}','fname_n${id}')">
@@ -1516,6 +1541,10 @@ function buildProductCard(index, canRemove) {
             <div class="upload-text">رفع الملف</div>
             <div class="upload-hint">PDF, JPG, PNG (حتى 5 ميجا)</div>
             <div class="file-name" id="fname_n${id}"></div>
+          </div>
+          <div style="margin-top:10px">
+            <label>تاريخ انتهاء هوية المنتج الوطني</label>
+            <input type="date" id="nationalExpiry_${id}" style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;direction:ltr">
           </div>
         </div>
       </div>
@@ -1525,7 +1554,7 @@ function buildProductCard(index, canRemove) {
       <div class="field field-full">
         <label>
           شهادة اعتماد المنتج من الجهات الحكومية <span class="req">*</span>
-          <span class="tooltip" data-tip="مثال: إذا كان المنتج يستخدم في مشروعات الطرق، يجب اعتماده من وزارة النقل">
+          <span class="tooltip" data-tip="إلزامية في حالة الجهة تمنح شهادات الاعتماد للمنتجات المستخدمة في مشاريعها وعقودها">
             <span class="tooltip-icon">?</span>
           </span>
         </label>
@@ -1717,7 +1746,9 @@ function submitForm() {
       phone:        allInputs[3] ? allInputs[3].value : '',
       email:        allInputs[4] ? allInputs[4].value : '',
       riada:        riadaInp ? riadaInp.value : 'no',
-      national:     natInp   ? natInp.value   : 'no',
+      national:     natInp   ? natInp.value   : 'yes',
+      riadaExpiry:  (card.querySelector('input[id^="riadaExpiry"]') || {}).value || '',
+      nationalExpiry: (card.querySelector('input[id^="nationalExpiry"]') || {}).value || '',
       riadaFile:    rFile && rFile.files[0]  ? rFile.files[0].name  : '',
       nationalFile: nFile && nFile.files[0]  ? nFile.files[0].name  : '',
       certFile:     cFile && cFile.files[0]  ? cFile.files[0].name  : ''
@@ -1810,8 +1841,11 @@ window.platformSubmitHandler = function(data) {
         </button>
         <div class="sidebar-section-label">التقارير</div>
         <button class="sidebar-item" onclick="showAdminSec('reports',this)"><span class="s-icon">📈</span> التقارير والإحصائيات</button>
+        <button class="sidebar-item" onclick="showAdminSec('leaderboard',this)"><span class="s-icon">🏆</span> المتصدرون</button>
         <div class="sidebar-section-label">الإدارة</div>
         <button class="sidebar-item" id="sideUsersItem" onclick="showAdminSec('users',this)" style="display:none"><span class="s-icon">👥</span> إدارة المستخدمين</button>
+        <button class="sidebar-item" onclick="showAdminSec('settings',this)"><span class="s-icon">⚙️</span> الإعدادات</button>
+        <button class="sidebar-item" onclick="showAdminSec('complaints',this)"><span class="s-icon">📝</span> الشكاوى <span class="sidebar-badge" id="sideComplaintCount" style="background:#ef4444">0</span></button>
       </div>
       <div class="sidebar-footer">
         <div class="sidebar-user">
@@ -1867,24 +1901,31 @@ window.platformSubmitHandler = function(data) {
           <div class="tbl-card">
             <div class="tbl-header">
               <div class="tbl-title">📋 جميع الطلبات</div>
-              <div class="tbl-tools">
-                <input class="tbl-search" placeholder="🔍 بحث..." oninput="filterTable(this.value)">
+              <div class="tbl-tools" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <input class="tbl-search" id="advSearch" placeholder="🔍 بحث بالاسم، الشركة، السجل، الهاتف، البريد، المشروع..." oninput="advancedFilter()" style="width:360px">
+                <select id="advStatusFilter" onchange="advancedFilter()" style="padding:8px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px">
+                  <option value="">جميع الحالات</option>
+                  <option value="pending">قيد المراجعة</option>
+                  <option value="approved">معتمد</option>
+                  <option value="rejected">مرفوض</option>
+                </select>
                 <button class="btn-excel" onclick="exportExcel()">📊 تصدير Excel</button>
               </div>
             </div>
-            <div style="overflow-x:auto">
-              <table id="reqTable">
+            <div style="overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch">
+              <table id="reqTable" style="min-width:1500px">
                 <thead>
                   <tr>
                     <th>#</th><th>رقم الطلب</th><th>اسم السلعة</th><th>الشركة المصنعة</th>
                     <th>رقم السجل</th><th>المحافظة</th><th>الولاية</th><th>التواصل</th>
-                    <th>ريادة</th><th>هوية وطنية</th>
+                    <th>نوع المشروع</th>
+                    <th>ريادة</th><th>انتهاء ريادة</th><th>هوية وطنية</th><th>انتهاء الهوية</th>
                     <th>مستند ريادة</th><th>مستند هوية</th><th>شهادة اعتماد</th>
                     <th>الحالة</th><th>التاريخ</th><th>الإجراءات</th>
                   </tr>
                 </thead>
                 <tbody id="reqTableBody">
-                  <tr><td colspan="16" style="text-align:center;padding:40px;color:var(--muted)">لا توجد طلبات مسجلة بعد</td></tr>
+                  <tr><td colspan="19" style="text-align:center;padding:40px;color:var(--muted)">لا توجد طلبات مسجلة بعد</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1903,6 +1944,31 @@ window.platformSubmitHandler = function(data) {
           </div>
         </div>
 
+        <!-- LEADERBOARD -->
+        <div class="admin-section" id="sec-leaderboard">
+          <div style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;color:var(--primary);margin-bottom:24px">🏆 المتصدرون</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+            <div class="chart-card">
+              <div class="chart-title" style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">🏭</span> أعلى المصانع مبيعاً</div>
+              <div id="lbTopMfg" style="padding:8px 0"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">جارٍ التحميل...</div></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title" style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">🏗️</span> أعلى المقاولين شراءً</div>
+              <div id="lbTopContractors" style="padding:8px 0"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">جارٍ التحميل...</div></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div class="chart-card">
+              <div class="chart-title" style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">📦</span> أعلى السلع طلباً</div>
+              <div id="lbTopProducts" style="padding:8px 0"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">جارٍ التحميل...</div></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title" style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">🏛️</span> أعلى الجهات</div>
+              <div id="lbTopEntities" style="padding:8px 0"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">جارٍ التحميل...</div></div>
+            </div>
+          </div>
+        </div>
+
       
         <!-- USERS MANAGEMENT -->
         <div class="admin-section" id="sec-users">
@@ -1914,6 +1980,48 @@ window.platformSubmitHandler = function(data) {
             <thead><tr><th>#</th><th>اسم المستخدم</th><th>الاسم الكامل</th><th>البريد الإلكتروني</th><th>الصلاحية</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
             <tbody id="usersTableBody"><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">لا يوجد مستخدمون</td></tr></tbody>
           </table></div></div>
+        </div>
+        <!-- SETTINGS -->
+        <div class="admin-section" id="sec-settings">
+          <div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary);margin-bottom:20px">⚙️ إعدادات النظام</div>
+          <div class="chart-card" style="max-width:600px">
+            <div class="chart-title">نسبة الأفضلية السعرية لمنتجات ريادة</div>
+            <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.8">جميع السلع المصنفة كـ "ريادة" تحصل على أفضلية سعرية تُعرض للمقاول. يمكنك تغيير النسبة وستُحدّث تلقائياً لجميع السلع.</div>
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+              <div style="display:flex;align-items:center;gap:8px;flex:1">
+                <input type="number" id="riadaPrefInput" min="0" max="100" step="1" value="10" style="width:100px;padding:12px;border:2px solid var(--border);border-radius:10px;font-size:18px;font-weight:900;text-align:center;font-family:'Tajawal',sans-serif;color:var(--primary)">
+                <span style="font-size:18px;font-weight:900;color:var(--primary)">%</span>
+              </div>
+              <button class="btn-login" onclick="saveRiadaPreference()" style="width:auto;padding:12px 24px;background:linear-gradient(135deg,var(--success),#34d399);font-size:14px">💾 حفظ وتطبيق</button>
+            </div>
+            <div id="riadaPrefMsg" style="display:none;padding:10px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;font-size:13px;color:#059669;text-align:center"></div>
+          </div>
+        </div>
+        <!-- COMPLAINTS -->
+        <div class="admin-section" id="sec-complaints">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary)">📝 الشكاوى الواردة</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="tbl-search" id="complaintSearch" placeholder="🔍 بحث..." oninput="filterComplaints(this.value)" style="width:250px">
+              <select id="complaintStatusFilter" onchange="filterComplaints(document.getElementById('complaintSearch').value)" style="padding:8px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px">
+                <option value="">جميع الحالات</option>
+                <option value="pending">قيد المراجعة</option>
+                <option value="in_progress">جاري المعالجة</option>
+                <option value="resolved">تم الحل</option>
+                <option value="closed">مغلقة</option>
+              </select>
+            </div>
+          </div>
+          <div class="tbl-card"><div style="overflow-x:auto">
+            <table>
+              <thead><tr>
+                <th>#</th><th>رقم الشكوى</th><th>النوع</th><th>الجهة المشتكى عليها</th><th>التفاصيل</th><th>البريد</th><th>الهاتف</th><th>التاريخ</th><th>الحالة</th><th>الإجراءات</th>
+              </tr></thead>
+              <tbody id="complaintsTableBody">
+                <tr><td colspan="10" style="text-align:center;padding:40px;color:var(--muted)">لا توجد شكاوى</td></tr>
+              </tbody>
+            </table>
+          </div></div>
         </div>
 </div>
     </div>
@@ -2085,11 +2193,11 @@ function openForm() {
       const crnEl = document.getElementById('crn_1');
       const phoneEl = document.getElementById('phone_1');
       const emailEl = document.getElementById('email_1');
-      if (companyEl && !companyEl.value) companyEl.value = currentManufacturer.full_name || '';
-      if (crnEl && !crnEl.value) crnEl.value = currentManufacturer.username || '';
-      if (phoneEl && !phoneEl.value) phoneEl.value = currentManufacturer.password_hash || '';
-      if (emailEl && !emailEl.value) emailEl.value = currentManufacturer.email || '';
-    }, 100);
+      if (companyEl) companyEl.value = currentManufacturer.full_name || '';
+      if (crnEl) crnEl.value = currentManufacturer.username || '';
+      if (phoneEl) phoneEl.value = currentManufacturer.password_hash || '';
+      if (emailEl) emailEl.value = currentManufacturer.email || '';
+    }, 150);
   }
 }
 function closeForm() {
@@ -2197,12 +2305,15 @@ function showAdminSec(name, btn) {
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
-  const titles = { dashboard:'لوحة المعلومات', requests:'إدارة الطلبات', reports:'التقارير والإحصائيات', users:'إدارة المستخدمين' };
+  const titles = { dashboard:'لوحة المعلومات', requests:'إدارة الطلبات', reports:'التقارير والإحصائيات', leaderboard:'المتصدرون', users:'إدارة المستخدمين', settings:'الإعدادات', complaints:'الشكاوى' };
   document.getElementById('adminPageTitle').textContent = titles[name] || '';
   if (name === 'dashboard') renderDashboard();
   if (name === 'requests')  loadAndRenderTable();
   if (name === 'reports')   renderReports();
+  if (name === 'leaderboard') renderLeaderboard();
   if (name === 'users')     loadAndRenderUsers();
+  if (name === 'settings')  loadRiadaPreference();
+  if (name === 'complaints') loadComplaints();
 }
 
 async function refreshAdmin() {
@@ -2215,6 +2326,14 @@ async function refreshAdmin() {
   renderTable(allRequests);
   renderReports();
   document.getElementById('sideReqCount').textContent = allRequests.filter(r => r.status === 'pending').length;
+  // Update complaint badge
+  try {
+    const cmps = await sbGet('complaints', 'status=eq.pending');
+    document.getElementById('sideComplaintCount').textContent = cmps.length;
+  } catch(e) {
+    const cmps = JSON.parse(localStorage.getItem('isnad_complaints') || '[]');
+    document.getElementById('sideComplaintCount').textContent = cmps.filter(c => c.status === 'pending').length;
+  }
 }
 
 async function loadAndRenderTable() {
@@ -2228,7 +2347,7 @@ async function loadAndRenderTable() {
 }
 
 function showTableLoading() {
-  document.getElementById('reqTableBody').innerHTML = '<tr><td colspan="16" style="text-align:center;padding:40px;color:var(--muted)">⏳ جارٍ التحميل...</td></tr>';
+  document.getElementById('reqTableBody').innerHTML = '<tr><td colspan="19" style="text-align:center;padding:40px;color:var(--muted)">⏳ جارٍ التحميل...</td></tr>';
 }
 
 function renderDashboard() {
@@ -2289,7 +2408,7 @@ function renderDashboard() {
     </div>`).join('');
 }
 
-function sLabel(s) { return s === 'approved' ? 'معتمد' : s === 'rejected' ? 'مرفوض' : 'قيد المراجعة'; }
+function sLabel(s) { return s === 'approved' ? 'معتمد' : s === 'rejected' ? 'مرفوض' : s === 'modification' ? 'طلب تعديل' : 'قيد المراجعة'; }
 
 // ============================================================
 // FILE VIEWER
@@ -2391,7 +2510,7 @@ function fmtDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDat
 function renderTable(list) {
   const tbody = document.getElementById('reqTableBody');
   if (!list || !list.length) {
-    tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:40px;color:var(--muted)">لا توجد طلبات</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="19" style="text-align:center;padding:40px;color:var(--muted)">لا توجد طلبات</td></tr>';
     return;
   }
   let rowNum = 0;
@@ -2419,12 +2538,16 @@ function renderTable(list) {
       const pn = p.productName || p.product_name || '—';
       const ri = (p.riada === 'yes') ? '✅' : '❌';
       const na = (p.national === 'yes') ? '✅' : '❌';
+      const riadaExp = p.riadaExpiry || '—';
+      const natExp = p.nationalExpiry || '—';
+      const projTypes = (r.projects || []).join('، ') || '—';
       // مرفقات كل سلعة: من الـ product نفسه أولاً، ثم fallback لمستوى الطلب (للبيانات القديمة)
       const rf = p.riada_file || p.riadaFile || r.riada_file || r.riadaFile || '';
       const nf = p.national_file || p.nationalFile || r.national_file || r.nationalFile || '';
       const cf = p.cert_file || p.certFile || r.cert_file || r.certFile || '';
       // حالة كل سلعة مستقلة
       const pStatus = p.status || r.status || 'pending';
+      const rejReason = p.rejection_reason || '';
 
       return `<tr>
         <td>${rowNum}</td>
@@ -2435,17 +2558,20 @@ function renderTable(list) {
         <td>${gv}</td>
         <td>${wl}</td>
         <td>${ph}</td>
+        <td style="font-size:11px;max-width:120px;white-space:normal">${projTypes}</td>
         <td>${ri}</td>
+        <td style="font-size:11px;direction:ltr">${riadaExp}</td>
         <td>${na}</td>
+        <td style="font-size:11px;direction:ltr">${natExp}</td>
         <td>${rf ? fileChip(rf, 'مستند ريادة', rn) : '—'}</td>
         <td>${nf ? fileChip(nf, 'هوية وطنية', rn) : '—'}</td>
         <td>${cf ? fileChip(cf, 'شهادة اعتماد', rn) : '—'}</td>
-        <td><span class="badge badge-${pStatus}">${sLabel(pStatus)}</span></td>
+        <td><span class="badge badge-${pStatus}">${sLabel(pStatus)}</span>${pStatus === 'rejected' && rejReason ? '<div style="font-size:10px;color:var(--danger);margin-top:3px">'+rejReason+'</div>' : ''}</td>
         <td>${dt}</td>
         <td style="white-space:nowrap">
           <button class="tbl-btn tbl-btn-view"    onclick="viewDetail(${id})">عرض</button>
           <button class="tbl-btn tbl-btn-approve" onclick="changeProductStatus(${id},${pi},'approved')">قبول</button>
-          <button class="tbl-btn tbl-btn-reject"  onclick="changeProductStatus(${id},${pi},'rejected')">رفض</button>
+          <button class="tbl-btn tbl-btn-reject"  onclick="rejectWithReason(${id},${pi})">رفض</button>
           <button class="tbl-btn tbl-btn-delete"  onclick="deleteProductRow(${id},${pi})">حذف</button>
         </td>
       </tr>`;
@@ -2457,6 +2583,28 @@ function filterTable(v) {
   if (!v) { renderTable(allRequests); return; }
   const lv = v.toLowerCase();
   renderTable(allRequests.filter(r => JSON.stringify(r).toLowerCase().includes(lv)));
+}
+
+function advancedFilter() {
+  const q = (document.getElementById('advSearch').value || '').toLowerCase().trim();
+  const st = document.getElementById('advStatusFilter').value;
+  let filtered = allRequests;
+  if (q) {
+    filtered = filtered.filter(r => {
+      const prods = r.products || [{ productName: r.product_name }];
+      const prodNames = prods.map(p => (p.productName || p.product_name || '').toLowerCase()).join(' ');
+      const projTypes = (r.projects || []).join(' ').toLowerCase();
+      const searchStr = [r.ref_num, prodNames, r.company, r.crn, r.phone, r.email, r.gov, r.wilaya, projTypes].join(' ').toLowerCase();
+      return searchStr.includes(q);
+    });
+  }
+  if (st) {
+    filtered = filtered.filter(r => {
+      const prods = r.products || [{ status: r.status }];
+      return prods.some(p => (p.status || r.status) === st);
+    });
+  }
+  renderTable(filtered);
 }
 
 async function changeProductStatus(id, pi, status) {
@@ -2478,6 +2626,40 @@ async function changeProductStatus(id, pi, status) {
     renderTable(allRequests);
     alert('خطأ في تحديث الحالة: ' + e.message);
   }
+}
+
+function rejectWithReason(id, pi) {
+  const r = allRequests.find(x => x.id === id);
+  if (!r || !r.products || !r.products[pi]) return;
+  const pName = r.products[pi].productName || r.products[pi].product_name || 'السلعة';
+  showConfirm({
+    icon: '❌',
+    title: 'رفض السلعة',
+    msg: `<div style="text-align:right;margin-bottom:12px">هل تريد رفض السلعة "<strong>${pName}</strong>"؟</div>
+          <div style="text-align:right;margin-bottom:6px;font-size:13px;color:var(--muted)">سبب الرفض (اختياري):</div>
+          <textarea id="rejectReasonInput" rows="3" placeholder="اكتب سبب الرفض هنا..." style="width:100%;padding:10px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;resize:vertical;direction:rtl"></textarea>`,
+    okLabel: 'رفض',
+    okColor: '#dc2626',
+    onOk: async () => {
+      const reason = (document.getElementById('rejectReasonInput') || {}).value || '';
+      r.products[pi].status = 'rejected';
+      r.products[pi].rejection_reason = reason;
+      renderTable(allRequests);
+      try {
+        await sbPatch('requests', id, { products: r.products, updated_at: new Date().toISOString() });
+        if (r.email) {
+          const fakeR = { ...r, product_name: pName, status: 'rejected', rejection_reason: reason };
+          await sendRejectionEmail(fakeR);
+        }
+        refreshAdmin();
+      } catch(e) {
+        r.products[pi].status = 'pending';
+        delete r.products[pi].rejection_reason;
+        renderTable(allRequests);
+        alert('خطأ: ' + e.message);
+      }
+    }
+  });
 }
 
 async function deleteProductRow(id, pi) {
@@ -2538,7 +2720,7 @@ async function sendApprovalEmail(r) {
   // Since we don't have an Edge Function deployed, we'll use a mailto link as visual feedback
   // In production, replace with actual Edge Function call
 
-  const subject = encodeURIComponent('نظام قائمة المنتجات الوطنية — اعتماد طلبك');
+  const subject = encodeURIComponent('نظام قائمة المنتجات الوطنية الإلكتروني — اعتماد طلبك');
   const body = encodeURIComponent(
     `السلام عليكم ورحمة الله وبركاته،\n\n` +
     `يسعدنا إشعاركم بأنه تم اعتماد طلب تسجيل منتجكم في قائمة المنتجات الوطنية الإلكترونية.\n\n` +
@@ -2556,6 +2738,7 @@ async function sendApprovalEmail(r) {
 async function sendRejectionEmail(r) {
   const email = r.email;
   if (!email) return;
+  const reason = r.rejection_reason ? `\nسبب الرفض: ${r.rejection_reason}\n` : '';
 
   const subject = encodeURIComponent('نظام قائمة المنتجات الوطنية الإلكتروني — اعتذار بشأن طلبك');
   const body = encodeURIComponent(
@@ -2565,7 +2748,8 @@ async function sendRejectionEmail(r) {
     `تفاصيل الطلب المرفوض:\n` +
     `رقم الطلب: ${r.ref_num || r.refNum}\n` +
     `اسم السلعة: ${r.product_name || r.productName}\n` +
-    `الشركة المصنعة: ${r.company}\n\n` +
+    `الشركة المصنعة: ${r.company}\n` +
+    reason + `\n` +
     `يمكنكم التواصل معنا لمزيد من التوضيح أو إعادة تقديم الطلب بعد استيفاء المتطلبات.\n\n` +
     `مع تحيات هيئة المشاريع والمناقصات والمحتوى المحلي`
   );
@@ -2598,7 +2782,7 @@ function showEmailModal(r, email, subject, body, type='approved') {
 function showConfirm({ icon='🗑️', title='تأكيد', msg='', okLabel='تأكيد', okColor='#ef4444', onOk }) {
   document.getElementById('confirmIcon').textContent = icon;
   document.getElementById('confirmTitle').textContent = title;
-  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmMsg').innerHTML = msg;
   const okBtn = document.getElementById('confirmOkBtn');
   const cancelBtn = document.getElementById('confirmCancelBtn');
   okBtn.textContent = okLabel;
@@ -2730,14 +2914,17 @@ function exportExcel() {
         'الولاية': r.wilaya || p.wilaya || '',
         'رقم التواصل': r.phone || p.phone || '',
         'البريد الإلكتروني': r.email || p.email || '',
+        'أنواع المشاريع': (r.projects || []).join(' | '),
         'ريادة': (p.riada || r.riada) === 'yes' ? 'نعم' : 'لا',
+        'تاريخ انتهاء ريادة': p.riadaExpiry || '',
         'هوية المنتج الوطني': (p.national || r.national) === 'yes' ? 'نعم' : 'لا',
+        'تاريخ انتهاء الهوية': p.nationalExpiry || '',
         'مستند ريادة': p.riada_file || p.riadaFile || '',
         'مستند هوية': p.national_file || p.nationalFile || '',
         'شهادة اعتماد': p.cert_file || p.certFile || '',
         'الحالة': sLabel(p.status || r.status),
+        'سبب الرفض': p.rejection_reason || '',
         'التاريخ': fmtDate(r.created_at || r.date),
-        'أنواع المشاريع': (r.projects || []).join(' | '),
         'الجهات المالكة': (r.entities || []).join(' | ')
       });
     });
@@ -3188,7 +3375,8 @@ async function loadContractorProducts() {
             productName: p.productName || p.product_name || r.product_name || '—',
             company: p.company || r.company || '—', crn: p.crn || r.crn || '—',
             gov: p.gov || r.gov || '—', email: p.email || r.email || '',
-            phone: p.phone || r.phone || '', amount: 0, selected: false
+            phone: p.phone || r.phone || '', amount: 0, selected: false,
+            riada: p.riada || r.riada || 'no'
           });
         }
       });
@@ -3203,55 +3391,82 @@ async function loadContractorProducts() {
 function renderContractorProducts() {
   const tbody = document.getElementById('conProductsBody');
   if (!conFilteredProducts.length) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">لا توجد سلع معتمدة حالياً</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">لا توجد سلع معتمدة حالياً</td></tr>';
     return;
   }
+  const pref = parseFloat(localStorage.getItem('isnad_riada_pref') || '10');
   tbody.innerHTML = conFilteredProducts.map((p, i) => {
     const gi = allApprovedProducts.indexOf(p);
+    const riadaBadge = p.riada === 'yes' ? '<span style="display:inline-block;background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;margin-right:6px">⭐ ريادة — أفضلية ' + pref + '%</span>' : '';
     return '<tr>' +
-      '<td><input type="checkbox" class="con-prod-check" data-idx="' + gi + '" ' + (p.selected ? 'checked' : '') + ' onchange="toggleProductSelection(' + gi + ',this.checked)"></td>' +
       '<td>' + (i+1) + '</td>' +
-      '<td><strong>' + p.productName + '</strong></td>' +
+      '<td><strong>' + p.productName + '</strong>' + riadaBadge + '</td>' +
       '<td>' + p.company + '</td><td>' + p.crn + '</td><td>' + p.gov + '</td>' +
       '<td style="direction:ltr;font-size:12px">' + (p.email||'—') + '</td>' +
       '<td style="direction:ltr;font-size:12px">' + (p.phone||'—') + '</td>' +
-      '<td><input type="number" data-idx="' + gi + '" value="' + (p.amount||'') + '" min="0" step="0.001" placeholder="0.000" ' +
-      'style="width:100px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-family:Tajawal,sans-serif;font-size:13px;text-align:center;direction:ltr" ' +
-      'oninput="updateProductAmount(' + gi + ',this.value)"></td></tr>';
+      '<td><button class="tbl-btn tbl-btn-approve" onclick="openRFQModal(' + gi + ')" style="white-space:nowrap">📋 طلب عرض سعر</button></td></tr>';
   }).join('');
-  updateSelectedSummary();
-}
-
-function toggleProductSelection(idx, checked) { allApprovedProducts[idx].selected = checked; updateSelectedSummary(); }
-
-function toggleSelectAllProducts(master) {
-  conFilteredProducts.forEach(p => { allApprovedProducts[allApprovedProducts.indexOf(p)].selected = master.checked; });
-  document.querySelectorAll('.con-prod-check').forEach(cb => cb.checked = master.checked);
-  updateSelectedSummary();
-}
-
-function updateProductAmount(idx, val) { allApprovedProducts[idx].amount = parseFloat(val) || 0; updateSelectedSummary(); }
-
-function updateSelectedSummary() {
-  const sel = allApprovedProducts.filter(p => p.selected);
-  document.getElementById('conSelectedCount').textContent = sel.length;
-  document.getElementById('conSelectedTotal').textContent = sel.reduce((s, p) => s + (p.amount||0), 0).toFixed(3);
 }
 
 function filterContractorProducts(val) {
   if (!val) { conFilteredProducts = allApprovedProducts.slice(); }
-  else { const lv = val.toLowerCase(); conFilteredProducts = allApprovedProducts.filter(p => (p.productName+p.company+p.crn+p.gov).toLowerCase().includes(lv)); }
+  else { const lv = val.toLowerCase(); conFilteredProducts = allApprovedProducts.filter(p => (p.productName+p.company+p.crn+p.gov+p.email+p.phone).toLowerCase().includes(lv)); }
   renderContractorProducts();
 }
 
-async function submitContractorOrder() {
-  const selected = allApprovedProducts.filter(p => p.selected);
-  if (!selected.length) { alert('يرجى اختيار سلعة واحدة على الأقل'); return; }
-  if (selected.some(p => !p.amount || p.amount <= 0)) { alert('يرجى تحديد المبلغ بالريال العماني لكل سلعة محددة'); return; }
+// RFQ Modal
+function openRFQModal(idx) {
+  const p = allApprovedProducts[idx];
+  if (!p) return;
+  document.getElementById('rfqProductName').textContent = p.productName;
+  document.getElementById('rfqCompany').textContent = p.company + ' (سجل: ' + p.crn + ')';
+  document.getElementById('rfqGov').textContent = p.gov;
+  document.getElementById('rfqIdx').value = idx;
+  document.getElementById('rfqQty').value = '';
+  document.getElementById('rfqDeliveryDate').value = '';
+  document.getElementById('rfqSpecs').value = '';
+  document.getElementById('rfqDeliveryGov').innerHTML = govOptions();
+  document.getElementById('rfqDeliveryWilayaField').style.display = 'none';
+  document.getElementById('rfqModal').classList.add('open');
+}
 
-  const totalAmount = selected.reduce((s, p) => s + p.amount, 0);
-  const orderRef = 'ORD-' + Date.now().toString(36).toUpperCase();
+function onRFQGovChange() {
+  const govSel = document.getElementById('rfqDeliveryGov');
+  const wilSel = document.getElementById('rfqDeliveryWilaya');
+  const wilField = document.getElementById('rfqDeliveryWilayaField');
+  const govVal = govSel.value;
+  if (!govVal) { wilField.style.display = 'none'; return; }
+  wilField.style.display = 'block';
+  const list = (typeof wilayat !== 'undefined' && wilayat[govVal]) ? wilayat[govVal] : [];
+  wilSel.innerHTML = '<option value="">-- اختر الولاية --</option>' + list.map(w => '<option value="'+w+'">'+w+'</option>').join('');
+}
+
+async function submitRFQ() {
+  const idx = parseInt(document.getElementById('rfqIdx').value);
+  const p = allApprovedProducts[idx];
+  if (!p) return;
+  const qty = document.getElementById('rfqQty').value.trim();
+  const govSel = document.getElementById('rfqDeliveryGov');
+  const wilSel = document.getElementById('rfqDeliveryWilaya');
+  const deliveryGov = govSel.options[govSel.selectedIndex] ? govSel.options[govSel.selectedIndex].text : '';
+  const deliveryWilaya = wilSel ? wilSel.value : '';
+  const deliveryDate = document.getElementById('rfqDeliveryDate').value;
+  const specs = document.getElementById('rfqSpecs').value.trim();
+
+  if (!qty) { alert('يرجى إدخال الكمية المطلوبة'); return; }
+  if (!deliveryGov || deliveryGov.includes('اختر')) { alert('يرجى اختيار محافظة التسليم'); return; }
+  if (!deliveryDate) { alert('يرجى تحديد تاريخ التسليم'); return; }
+
+  const orderRef = 'RFQ-' + Date.now().toString(36).toUpperCase();
   const profile = currentContractor.profile || {};
+  const now = new Date();
+  // Deadline: 2 business days from now
+  const deadline = new Date(now);
+  let bDays = 0;
+  while (bDays < 2) { deadline.setDate(deadline.getDate() + 1); if (deadline.getDay() !== 5 && deadline.getDay() !== 6) bDays++; }
+
+  const btn = document.getElementById('rfqSubmitBtn');
+  btn.textContent = 'جارٍ الإرسال...'; btn.disabled = true;
 
   try {
     await sbPost('contractor_orders', {
@@ -3260,35 +3475,39 @@ async function submitContractorOrder() {
       contractor_email: profile.email || currentContractor.email || '',
       contractor_phone: profile.phone || '',
       project_name: profile.project_name || '',
-      items: selected.map(p => ({ productName: p.productName, company: p.company, crn: p.crn, email: p.email, phone: p.phone, amount: p.amount, item_status: 'pending' })),
-      items_count: selected.length, total_amount: totalAmount, status: 'pending'
+      items: [{
+        productName: p.productName, company: p.company, crn: p.crn,
+        email: p.email, phone: p.phone, amount: 0, item_status: 'pending',
+        quantity: qty, delivery_gov: deliveryGov, delivery_wilaya: deliveryWilaya,
+        delivery_date: deliveryDate, specs: specs,
+        rfq_deadline: deadline.toISOString(), rfq_sent_at: now.toISOString()
+      }],
+      items_count: 1, total_amount: 0, status: 'pending'
     });
 
-    // Show success
+    document.getElementById('rfqModal').classList.remove('open');
+
+    // Success modal
     document.getElementById('conOrderSuccessDetails').innerHTML =
-      '<div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:12px">رقم الطلب: ' + orderRef + '</div>' +
-      '<div style="font-size:12px;color:var(--muted);margin-bottom:8px">تم إرسال إشعارات إلى أصحاب السلع التالية:</div>' +
-      selected.map(p =>
-        '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:8px">' +
-        '<div style="font-size:13px;font-weight:600;color:var(--text)">' + p.productName + ' — ' + p.company + '</div>' +
-        '<div style="font-size:11px;color:var(--muted);margin-top:4px">📧 ' + (p.email||'—') + ' | 📱 ' + (p.phone||'—') + ' | 💰 ' + p.amount.toFixed(3) + ' ر.ع</div></div>'
-      ).join('') +
-      '<div style="font-size:14px;font-weight:900;color:var(--success);margin-top:12px;text-align:center">الإجمالي: ' + totalAmount.toFixed(3) + ' ر.ع</div>';
+      '<div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:12px">رقم طلب عرض السعر: ' + orderRef + '</div>' +
+      '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px">' +
+      '<div style="font-size:13px;font-weight:600;color:var(--text)">' + p.productName + ' — ' + p.company + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:6px">الكمية: <strong>' + qty + '</strong> | التسليم: <strong>' + deliveryGov + (deliveryWilaya ? ' - ' + deliveryWilaya : '') + '</strong> | بتاريخ: <strong>' + deliveryDate + '</strong></div>' +
+      (specs ? '<div style="font-size:11px;color:var(--muted);margin-top:4px">المواصفات: ' + specs + '</div>' : '') +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--accent);margin-top:8px;text-align:center">⏳ مهلة الاستجابة: يومين عمل (حتى ' + deadline.toLocaleDateString('ar-SA') + ')</div>';
     document.getElementById('conOrderSuccessModal').classList.add('open');
 
-    // Open mailto for each owner
-    selected.forEach(item => {
-      if (item.email) {
-        const subj = encodeURIComponent('منصة إسناد — طلب شراء سلعة من مقاول');
-        const body = encodeURIComponent('السلام عليكم،\n\nالمقاول "' + currentContractor.full_name + '" (سجل: ' + currentContractor.username + ') طلب شراء "' + item.productName + '" بمبلغ ' + item.amount.toFixed(3) + ' ر.ع\n\nرقم الطلب: ' + orderRef + '\nالمشروع: ' + (profile.project_name||'—') + '\nهاتف المقاول: ' + (profile.phone||'—') + '\n\nمنصة إسناد');
-        window.open('mailto:' + item.email + '?subject=' + subj + '&body=' + body, '_blank');
-      }
-    });
+    // mailto
+    if (p.email) {
+      const subj = encodeURIComponent('قائمة المنتجات الوطنية — طلب عرض سعر');
+      const body = encodeURIComponent('السلام عليكم،\n\nالمقاول "' + currentContractor.full_name + '" (سجل: ' + currentContractor.username + ') يطلب عرض سعر للسلعة "' + p.productName + '"\n\nالكمية: ' + qty + '\nمكان التسليم: ' + deliveryGov + (deliveryWilaya ? ' - ' + deliveryWilaya : '') + '\nتاريخ التسليم: ' + deliveryDate + '\n' + (specs ? 'المواصفات: ' + specs + '\n' : '') + '\nرقم الطلب: ' + orderRef + '\nالمشروع: ' + (profile.project_name||'—') + '\nهاتف المقاول: ' + (profile.phone||'—') + '\n\nالمهلة: يومين عمل\n\nقائمة المنتجات الوطنية');
+      window.open('mailto:' + p.email + '?subject=' + subj + '&body=' + body, '_blank');
+    }
 
-    allApprovedProducts.forEach(p => { p.selected = false; p.amount = 0; });
-    renderContractorProducts();
     refreshContractorDashboard();
   } catch(e) { alert('خطأ في إرسال الطلب: ' + e.message); }
+  btn.textContent = '📤 إرسال طلب عرض السعر'; btn.disabled = false;
 }
 
 async function loadContractorOrders() {
@@ -3314,19 +3533,63 @@ async function loadContractorOrders() {
         '<div><strong style="color:var(--primary)">' + (o.order_ref||'—') + '</strong><span style="font-size:12px;color:var(--muted);margin-right:12px">' + fmtDate(o.created_at) + '</span></div>' +
         '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span style="font-size:15px;font-weight:900;color:var(--success)">' + (o.total_amount||0).toFixed(3) + ' ر.ع</span>' +
         Object.entries(mfgGroups).map(([crn, g]) =>
-          '<button class="btn-excel" style="font-size:10px;padding:3px 10px" onclick="conGenerateInvoice(' + o.id + ',\'' + crn + '\',\'' + (g.company||'').replace(/'/g,'') + '\')">📄 فاتورة ' + (g.company||crn) + '</button>'
+          '<button class="btn-excel" style="font-size:10px;padding:3px 10px" onclick="conGenerateInvoice(' + o.id + ',\'' + crn + '\',\'' + (g.company||'').replace(/'/g,'') + '\')">📄 عرض أسعار ' + (g.company||crn) + '</button>'
         ).join('') +
         '</div></div>' +
-        '<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="background:var(--bg)"><th style="padding:8px;text-align:right">السلعة</th><th style="padding:8px;text-align:right">الشركة</th><th style="padding:8px;text-align:center">المبلغ</th><th style="padding:8px;text-align:center">حالة الموافقة</th></tr></thead><tbody>' +
-        items.map(it =>
-          '<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">' + (it.productName||'—') + '</td>' +
+        '<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="background:var(--bg)"><th style="padding:8px;text-align:right">السلعة</th><th style="padding:8px;text-align:right">الشركة</th><th style="padding:8px;text-align:center">الكمية</th><th style="padding:8px;text-align:center">مكان التسليم</th><th style="padding:8px;text-align:center">المهلة</th><th style="padding:8px;text-align:center">الحالة</th></tr></thead><tbody>' +
+        items.map(it => {
+          let timerHtml = '';
+          if (it.rfq_deadline && (it.item_status||'pending') === 'pending') {
+            const dl = new Date(it.rfq_deadline);
+            const now = new Date();
+            const diffH = Math.max(0, Math.round((dl - now) / 36e5));
+            const diffD = Math.floor(diffH / 24);
+            const remH = diffH % 24;
+            timerHtml = diffH > 0 ? '<span style="color:var(--accent);font-weight:700;font-size:11px">⏳ ' + (diffD > 0 ? diffD + ' يوم ' : '') + remH + ' ساعة</span>' : '<span style="color:var(--danger);font-size:11px">⚠️ انتهت المهلة</span>';
+          }
+          let extraInfo = '';
+          if (it.item_status === 'approved' && it.unit_price) {
+            extraInfo = '<div style="font-size:11px;color:var(--success);margin-top:3px">سعر الوحدة: <strong>' + parseFloat(it.unit_price).toFixed(3) + '</strong> | الكمية: <strong>' + (it.approved_qty||it.quantity||'—') + '</strong> | الإجمالي: <strong>' + (it.amount||0).toFixed(3) + ' ر.ع</strong></div>';
+          }
+          if (it.item_status === 'modification' && it.modify_note) {
+            extraInfo = '<div style="font-size:11px;color:var(--info);margin-top:3px">📝 ملاحظة المصنّع: ' + it.modify_note + '</div>';
+          }
+          if (it.item_status === 'rejected' && it.rejection_reason) {
+            extraInfo = '<div style="font-size:11px;color:var(--danger);margin-top:3px">سبب الرفض: ' + it.rejection_reason + '</div>';
+          }
+          const modifyBtn = it.item_status === 'modification' ? '<button class="tbl-btn tbl-btn-view" onclick="openConModifyRFQ(' + o.id + ')" style="font-size:10px;margin-top:4px">✏️ تعديل وإعادة الإرسال</button>' : '';
+          return '<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">' + (it.productName||'—') + '</td>' +
           '<td style="padding:8px">' + (it.company||'—') + '</td>' +
-          '<td style="padding:8px;text-align:center">' + (it.amount||0).toFixed(3) + '</td>' +
-          '<td style="padding:8px;text-align:center"><span class="badge badge-' + (it.item_status||'pending') + '">' + sLabel(it.item_status||'pending') + '</span></td></tr>'
-        ).join('') +
+          '<td style="padding:8px;text-align:center">' + (it.quantity||'—') + '</td>' +
+          '<td style="padding:8px;text-align:center;font-size:11px">' + (it.delivery_gov||'—') + (it.delivery_wilaya ? ' - ' + it.delivery_wilaya : '') + '</td>' +
+          '<td style="padding:8px;text-align:center">' + timerHtml + '</td>' +
+          '<td style="padding:8px;text-align:center"><span class="badge badge-' + (it.item_status||'pending') + '">' + sLabel(it.item_status||'pending') + '</span>' + extraInfo + modifyBtn + '</td></tr>';
+        }).join('') +
         '</tbody></table></div>';
     }).join('');
   } catch(e) { container.innerHTML = '<div style="color:var(--danger);font-size:13px;text-align:center;padding:20px">خطأ: ' + e.message + '</div>'; }
+}
+
+function openConModifyRFQ(orderId) {
+  // Re-open RFQ modal pre-filled for modification
+  const order = window._conOrdersData[orderId];
+  if (!order) return;
+  const items = order.items || [];
+  const modItem = items.find(it => it.item_status === 'modification');
+  if (!modItem) return;
+  // Find the product in allApprovedProducts
+  const idx = allApprovedProducts.findIndex(p => p.productName === modItem.productName && p.crn === modItem.crn);
+  if (idx >= 0) {
+    openRFQModal(idx);
+    // Pre-fill with existing values
+    setTimeout(() => {
+      document.getElementById('rfqQty').value = modItem.quantity || '';
+      if (modItem.delivery_date) document.getElementById('rfqDeliveryDate').value = modItem.delivery_date;
+      if (modItem.specs) document.getElementById('rfqSpecs').value = modItem.specs;
+    }, 200);
+  } else {
+    alert('لم يتم العثور على السلعة — يرجى إنشاء طلب جديد');
+  }
 }
 
 function conGenerateInvoice(orderId, mfgCRN, mfgName) {
@@ -3493,17 +3756,32 @@ async function loadMfgIncomingOrders() {
       '<div><strong style="color:var(--primary)">' + (o.order_ref||'—') + '</strong>' +
       '<span style="font-size:12px;color:var(--muted);margin-right:12px">' + fmtDate(o.created_at) + '</span></div>' +
       '<div style="display:flex;gap:8px;align-items:center"><span style="font-size:12px;color:var(--muted)">المقاول: <strong style="color:var(--text)">' + (o.contractor_name||'—') + '</strong> | المشروع: <strong>' + (o.project_name||'—') + '</strong></span>' +
-      '<button class="btn-excel" style="font-size:11px;padding:4px 12px" onclick="generateInvoicePDF(window._mfgOrdersData[' + o.id + '],\'manufacturer\')">📄 فاتورة PDF</button></div></div>' +
+      '<button class="btn-excel" style="font-size:11px;padding:4px 12px" onclick="generateInvoicePDF(window._mfgOrdersData[' + o.id + '],\'manufacturer\')">📄 عرض أسعار PDF</button></div></div>' +
       o.myItems.map(it => {
         const st = it.item_status || 'pending';
-        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg);border-radius:10px;margin-bottom:8px;flex-wrap:wrap;gap:8px">' +
-          '<div><strong style="font-size:14px;color:var(--text)">' + (it.productName||'—') + '</strong>' +
-          '<div style="font-size:12px;color:var(--muted)">المبلغ: <strong style="color:var(--success)">' + (it.amount||0).toFixed(3) + ' ر.ع</strong></div></div>' +
-          '<div style="display:flex;gap:8px;align-items:center">' +
+        let timerHtml = '';
+        if (it.rfq_deadline && st === 'pending') {
+          const dl = new Date(it.rfq_deadline);
+          const now = new Date();
+          const diffH = Math.max(0, Math.round((dl - now) / 36e5));
+          const diffD = Math.floor(diffH / 24);
+          const remH = diffH % 24;
+          timerHtml = '<div style="font-size:11px;margin-top:4px">' + (diffH > 0 ? '<span style="color:var(--accent)">⏳ متبقي: ' + (diffD > 0 ? diffD + ' يوم ' : '') + remH + ' ساعة</span>' : '<span style="color:var(--danger)">⚠️ انتهت المهلة</span>') + '</div>';
+        }
+        return '<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px;background:var(--bg);border-radius:10px;margin-bottom:8px;flex-wrap:wrap;gap:8px">' +
+          '<div style="flex:1"><strong style="font-size:14px;color:var(--text)">' + (it.productName||'—') + '</strong>' +
+          (it.quantity ? '<div style="font-size:12px;color:var(--muted);margin-top:4px">الكمية: <strong>' + it.quantity + '</strong></div>' : '') +
+          (it.delivery_gov ? '<div style="font-size:12px;color:var(--muted)">التسليم: <strong>' + it.delivery_gov + (it.delivery_wilaya ? ' - ' + it.delivery_wilaya : '') + '</strong>' + (it.delivery_date ? ' — بتاريخ: <strong>' + it.delivery_date + '</strong>' : '') + '</div>' : '') +
+          (it.specs ? '<div style="font-size:11px;color:var(--info);margin-top:3px">📝 ' + it.specs + '</div>' : '') +
+          timerHtml + '</div>' +
+          '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
           '<span class="badge badge-' + st + '">' + sLabel(st) + '</span>' +
           (st === 'pending' ?
-            '<button class="tbl-btn tbl-btn-approve" onclick="mfgRespondItem(' + o.id + ',' + it._idx + ',\'approved\')">✅ موافقة</button>' +
-            '<button class="tbl-btn tbl-btn-reject" onclick="mfgRespondItem(' + o.id + ',' + it._idx + ',\'rejected\')">❌ رفض</button>' : '') +
+            '<button class="tbl-btn tbl-btn-approve" onclick="openMfgApproveModal(' + o.id + ',' + it._idx + ')">✅ موافقة</button>' +
+            '<button class="tbl-btn tbl-btn-reject" onclick="openMfgRejectModal(' + o.id + ',' + it._idx + ')">❌ رفض</button>' +
+            '<button class="tbl-btn tbl-btn-view" onclick="openMfgModifyModal(' + o.id + ',' + it._idx + ')">✏️ تعديل</button>' : '') +
+          (st === 'approved' && it.unit_price ? '<div style="font-size:11px;color:var(--success);margin-top:4px">سعر الوحدة: ' + it.unit_price + ' | الكمية: ' + (it.approved_qty||it.quantity||'—') + ' | الإجمالي: <strong>' + (it.amount||0).toFixed(3) + ' ر.ع</strong></div>' : '') +
+          (st === 'rejected' && it.rejection_reason ? '<div style="font-size:11px;color:var(--danger);margin-top:4px">سبب الرفض: ' + it.rejection_reason + '</div>' : '') +
           '</div></div>';
       }).join('') +
       '</div>'
@@ -3511,32 +3789,147 @@ async function loadMfgIncomingOrders() {
   } catch(e) { container.innerHTML = '<div style="color:var(--danger);font-size:13px;text-align:center;padding:20px">خطأ: ' + e.message + '</div>'; }
 }
 
-async function mfgRespondItem(orderId, itemIdx, newStatus) {
+// Store current action context
+let _mfgActionCtx = { orderId: null, itemIdx: null };
+
+function openMfgApproveModal(orderId, itemIdx) {
+  _mfgActionCtx = { orderId, itemIdx };
+  // Get item details for display
+  const orderData = window._mfgOrdersData || {};
+  let itemInfo = '';
+  Object.values(orderData).forEach(o => {
+    if (o.id === orderId) {
+      const items = o.myItems || o.items || [];
+      const it = items.find(x => x._idx === itemIdx) || items[itemIdx] || {};
+      itemInfo = it.productName || '';
+      document.getElementById('mfgApproveQty').value = it.quantity || '';
+    }
+  });
+  document.getElementById('mfgApproveProduct').textContent = itemInfo;
+  document.getElementById('mfgApproveUnitPrice').value = '';
+  document.getElementById('mfgApproveTotal').textContent = '0.000';
+  document.getElementById('mfgApproveModal').classList.add('open');
+}
+
+function calcMfgTotal() {
+  const up = parseFloat(document.getElementById('mfgApproveUnitPrice').value) || 0;
+  const qty = parseFloat(document.getElementById('mfgApproveQty').value) || 0;
+  document.getElementById('mfgApproveTotal').textContent = (up * qty).toFixed(3);
+}
+
+async function submitMfgApproval() {
+  const { orderId, itemIdx } = _mfgActionCtx;
+  const unitPrice = parseFloat(document.getElementById('mfgApproveUnitPrice').value);
+  const qty = parseFloat(document.getElementById('mfgApproveQty').value);
+  if (!unitPrice || unitPrice <= 0) { alert('يرجى إدخال سعر الوحدة'); return; }
+  if (!qty || qty <= 0) { alert('يرجى إدخال الكمية'); return; }
+  const total = unitPrice * qty;
+
   try {
-    // Fetch current order
     const orders = await sbGet('contractor_orders', 'id=eq.' + orderId);
     if (!orders.length) return;
     const order = orders[0];
     const items = order.items || [];
     if (!items[itemIdx]) return;
 
-    items[itemIdx].item_status = newStatus;
+    items[itemIdx].item_status = 'approved';
+    items[itemIdx].unit_price = unitPrice;
+    items[itemIdx].approved_qty = qty;
+    items[itemIdx].amount = total;
 
-    // Check if all items are resolved to update overall order status
     const allResolved = items.every(it => it.item_status === 'approved' || it.item_status === 'rejected');
     const allApproved = items.every(it => it.item_status === 'approved');
     const allRejected = items.every(it => it.item_status === 'rejected');
-    let orderStatus = order.status;
-    if (allResolved) { orderStatus = allApproved ? 'approved' : allRejected ? 'rejected' : 'partial'; }
+    let orderStatus = allResolved ? (allApproved ? 'approved' : allRejected ? 'rejected' : 'partial') : order.status;
+    const totalAmount = items.reduce((s, it) => s + (it.amount || 0), 0);
 
-    await sbPatch('contractor_orders', orderId, { items: items, status: orderStatus });
+    await sbPatch('contractor_orders', orderId, { items, status: orderStatus, total_amount: totalAmount });
 
-    // Send email notification to contractor
+    document.getElementById('mfgApproveModal').classList.remove('open');
+
     if (order.contractor_email) {
       const itemName = items[itemIdx].productName || '—';
-      const statusAr = newStatus === 'approved' ? 'وافق على' : 'رفض';
-      const subj = encodeURIComponent('منصة إسناد — رد على طلب شراء السلعة');
-      const body = encodeURIComponent('السلام عليكم،\n\nصاحب السلعة "' + itemName + '" ' + statusAr + ' طلبكم.\n\nرقم الطلب: ' + (order.order_ref||'—') + '\n\nمنصة إسناد');
+      const subj = encodeURIComponent('قائمة المنتجات الوطنية — عرض سعر للسلعة');
+      const body = encodeURIComponent('السلام عليكم،\n\nتمت الموافقة على طلبكم لعرض سعر السلعة "' + itemName + '".\n\nسعر الوحدة: ' + unitPrice.toFixed(3) + ' ر.ع\nالكمية: ' + qty + '\nالمبلغ الإجمالي: ' + total.toFixed(3) + ' ر.ع\n\nرقم الطلب: ' + (order.order_ref||'—') + '\n\nقائمة المنتجات الوطنية');
+      window.open('mailto:' + order.contractor_email + '?subject=' + subj + '&body=' + body, '_blank');
+    }
+
+    loadMfgIncomingOrders();
+    refreshManufacturerDashboard();
+  } catch(e) { alert('خطأ: ' + e.message); }
+}
+
+function openMfgRejectModal(orderId, itemIdx) {
+  _mfgActionCtx = { orderId, itemIdx };
+  document.getElementById('mfgRejectReason').value = '';
+  document.getElementById('mfgRejectModal').classList.add('open');
+}
+
+async function submitMfgRejection() {
+  const { orderId, itemIdx } = _mfgActionCtx;
+  const reason = document.getElementById('mfgRejectReason').value.trim();
+  if (!reason) { alert('يرجى اختيار أو كتابة سبب الرفض'); return; }
+
+  try {
+    const orders = await sbGet('contractor_orders', 'id=eq.' + orderId);
+    if (!orders.length) return;
+    const order = orders[0];
+    const items = order.items || [];
+    if (!items[itemIdx]) return;
+
+    items[itemIdx].item_status = 'rejected';
+    items[itemIdx].rejection_reason = reason;
+
+    const allResolved = items.every(it => it.item_status === 'approved' || it.item_status === 'rejected');
+    const allApproved = items.every(it => it.item_status === 'approved');
+    const allRejected = items.every(it => it.item_status === 'rejected');
+    let orderStatus = allResolved ? (allApproved ? 'approved' : allRejected ? 'rejected' : 'partial') : order.status;
+
+    await sbPatch('contractor_orders', orderId, { items, status: orderStatus });
+
+    document.getElementById('mfgRejectModal').classList.remove('open');
+
+    if (order.contractor_email) {
+      const itemName = items[itemIdx].productName || '—';
+      const subj = encodeURIComponent('قائمة المنتجات الوطنية — رفض طلب عرض سعر');
+      const body = encodeURIComponent('السلام عليكم،\n\nتم رفض طلبكم لعرض سعر السلعة "' + itemName + '".\n\nسبب الرفض: ' + reason + '\n\nرقم الطلب: ' + (order.order_ref||'—') + '\n\nقائمة المنتجات الوطنية');
+      window.open('mailto:' + order.contractor_email + '?subject=' + subj + '&body=' + body, '_blank');
+    }
+
+    loadMfgIncomingOrders();
+    refreshManufacturerDashboard();
+  } catch(e) { alert('خطأ: ' + e.message); }
+}
+
+function openMfgModifyModal(orderId, itemIdx) {
+  _mfgActionCtx = { orderId, itemIdx };
+  document.getElementById('mfgModifyNote').value = '';
+  document.getElementById('mfgModifyModal').classList.add('open');
+}
+
+async function submitMfgModify() {
+  const { orderId, itemIdx } = _mfgActionCtx;
+  const note = document.getElementById('mfgModifyNote').value.trim();
+  if (!note) { alert('يرجى كتابة ملاحظات التعديل'); return; }
+
+  try {
+    const orders = await sbGet('contractor_orders', 'id=eq.' + orderId);
+    if (!orders.length) return;
+    const order = orders[0];
+    const items = order.items || [];
+    if (!items[itemIdx]) return;
+
+    items[itemIdx].item_status = 'modification';
+    items[itemIdx].modify_note = note;
+
+    await sbPatch('contractor_orders', orderId, { items, status: 'modification' });
+
+    document.getElementById('mfgModifyModal').classList.remove('open');
+
+    if (order.contractor_email) {
+      const itemName = items[itemIdx].productName || '—';
+      const subj = encodeURIComponent('قائمة المنتجات الوطنية — طلب تعديل على عرض السعر');
+      const body = encodeURIComponent('السلام عليكم،\n\nالمصنّع يطلب تعديلاً على طلب عرض سعر السلعة "' + itemName + '".\n\nملاحظات التعديل:\n' + note + '\n\nرقم الطلب: ' + (order.order_ref||'—') + '\n\nيرجى تعديل الطلب وإعادة إرساله.\n\nقائمة المنتجات الوطنية');
       window.open('mailto:' + order.contractor_email + '?subject=' + subj + '&body=' + body, '_blank');
     }
 
@@ -3642,11 +4035,11 @@ async function generateInvoicePDF(order, callerRole) {
   doc.setFillColor(200, 144, 46);
   doc.rect(0, 36, pw, 2.5, 'F');
   doc.setFont(af, 'bold'); doc.setTextColor(232, 184, 75); doc.setFontSize(20);
-  doc.text('\u0646\u0638\u0627\u0645 \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0627\u0633\u062a\u0631\u0634\u0627\u062f\u064a\u0629', 105, 14, { align: 'center' });
+  doc.text('\u0646\u0638\u0627\u0645 \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0645\u0646\u062a\u062c\u0627\u062a \u0627\u0644\u0648\u0637\u0646\u064a\u0629', 105, 14, { align: 'center' });
   doc.setTextColor(255, 255, 255); doc.setFont(af, 'normal'); doc.setFontSize(9);
   doc.text('\u0647\u064a\u0626\u0629 \u0627\u0644\u0645\u0634\u0627\u0631\u064a\u0639 \u0648\u0627\u0644\u0645\u0646\u0627\u0642\u0635\u0627\u062a \u0648\u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u0627\u0644\u0645\u062d\u0644\u064a \u2014 \u0633\u0644\u0637\u0646\u0629 \u0639\u064f\u0645\u0627\u0646', 105, 24, { align: 'center' });
   doc.setFontSize(8); doc.setFont(af, 'normal');
-  doc.text('\u0641\u0627\u062a\u0648\u0631\u0629', 109, 32); doc.setFont(ef, 'normal'); doc.text('Invoice /', 96, 32);
+  doc.text('\u0639\u0631\u0636 \u0623\u0633\u0639\u0627\u0631', 109, 32); doc.setFont(ef, 'normal'); doc.text('Invoice /', 96, 32);
 
   // === ROW: Order Ref + Date (shaded) ===
   let y = 46;
@@ -3756,9 +4149,234 @@ async function generateInvoicePDF(order, callerRole) {
   doc.setFillColor(10, 37, 64); doc.rect(0, 280, pw, 17, 'F');
   doc.setFillColor(200, 144, 46); doc.rect(0, 279, pw, 1, 'F');
   doc.setTextColor(255, 255, 255); doc.setFont(af, 'normal'); doc.setFontSize(8);
-  doc.text('\u0646\u0638\u0627\u0645 \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0627\u0633\u062a\u0631\u0634\u0627\u062f\u064a\u0629 \u2014 \u0647\u064a\u0626\u0629 \u0627\u0644\u0645\u0634\u0627\u0631\u064a\u0639 \u0648\u0627\u0644\u0645\u0646\u0627\u0642\u0635\u0627\u062a \u0648\u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u0627\u0644\u0645\u062d\u0644\u064a \u2014 \u0633\u0644\u0637\u0646\u0629 \u0639\u064f\u0645\u0627\u0646', 105, 289, { align: 'center' });
+  doc.text('\u0646\u0638\u0627\u0645 \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0645\u0646\u062a\u062c\u0627\u062a \u0627\u0644\u0648\u0637\u0646\u064a\u0629 \u2014 \u0647\u064a\u0626\u0629 \u0627\u0644\u0645\u0634\u0627\u0631\u064a\u0639 \u0648\u0627\u0644\u0645\u0646\u0627\u0642\u0635\u0627\u062a \u0648\u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u0627\u0644\u0645\u062d\u0644\u064a \u2014 \u0633\u0644\u0637\u0646\u0629 \u0639\u064f\u0645\u0627\u0646', 105, 289, { align: 'center' });
 
-  doc.save('Invoice_' + (order.order_ref || 'order') + '.pdf');
+  doc.save('RFQ_' + (order.order_ref || 'order') + '.pdf');
+}
+
+// ============================================================
+// LEADERBOARD
+// ============================================================
+async function renderLeaderboard() {
+  try {
+    const orders = await sbGet('contractor_orders', 'order=created_at.desc');
+    const requests = allRequests.length ? allRequests : await sbGet('requests', 'order=created_at.desc');
+
+    // 1. Top Manufacturers by sales
+    const mfgSales = {};
+    orders.forEach(o => {
+      (o.items || []).forEach(it => {
+        if (it.item_status === 'approved' && it.amount > 0) {
+          const key = it.company || it.crn || 'غير معروف';
+          if (!mfgSales[key]) mfgSales[key] = { name: key, total: 0, count: 0 };
+          mfgSales[key].total += (it.amount || 0);
+          mfgSales[key].count++;
+        }
+      });
+    });
+    const topMfg = Object.values(mfgSales).sort((a, b) => b.total - a.total).slice(0, 5);
+
+    // 2. Top Contractors by purchases
+    const conPurchases = {};
+    orders.forEach(o => {
+      const key = o.contractor_name || o.crn || 'غير معروف';
+      if (!conPurchases[key]) conPurchases[key] = { name: key, total: 0, count: 0 };
+      conPurchases[key].total += (o.total_amount || 0);
+      conPurchases[key].count++;
+    });
+    const topCon = Object.values(conPurchases).sort((a, b) => b.total - a.total).slice(0, 5);
+
+    // 3. Top Products by request count
+    const prodCount = {};
+    orders.forEach(o => {
+      (o.items || []).forEach(it => {
+        const key = it.productName || 'غير معروف';
+        if (!prodCount[key]) prodCount[key] = { name: key, count: 0 };
+        prodCount[key].count++;
+      });
+    });
+    const topProds = Object.values(prodCount).sort((a, b) => b.count - a.count).slice(0, 5);
+
+    // 4. Top Entities
+    const entityCount = {};
+    requests.forEach(r => {
+      (r.entities || []).forEach(e => {
+        if (!entityCount[e]) entityCount[e] = { name: e, count: 0 };
+        entityCount[e].count++;
+      });
+    });
+    const topEntities = Object.values(entityCount).sort((a, b) => b.count - a.count).slice(0, 5);
+
+    // Render helpers
+    const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+    const colors = ['#c8902e','#6b7280','#b45309','#64748b','#64748b'];
+
+    function renderRankList(container, items, valueLabel, valueKey, isMoney) {
+      const el = document.getElementById(container);
+      if (!items.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">لا توجد بيانات كافية</div>'; return; }
+      const maxVal = items[0][valueKey] || 1;
+      el.innerHTML = items.map((item, i) => {
+        const pct = Math.round((item[valueKey] / maxVal) * 100);
+        const val = isMoney ? item[valueKey].toFixed(3) + ' ر.ع' : item[valueKey];
+        return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;' + (i < items.length - 1 ? 'border-bottom:1px solid var(--border);' : '') + '">' +
+          '<span style="font-size:20px;width:30px;text-align:center">' + medals[i] + '</span>' +
+          '<div style="flex:1;min-width:0">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + item.name + '</span><span style="font-size:12px;font-weight:800;color:' + colors[i] + ';white-space:nowrap;margin-right:8px">' + val + '</span></div>' +
+          '<div style="height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,' + colors[i] + ',' + colors[i] + '88);border-radius:3px;transition:width .5s"></div></div>' +
+          '</div></div>';
+      }).join('');
+    }
+
+    renderRankList('lbTopMfg', topMfg, 'المبيعات', 'total', true);
+    renderRankList('lbTopContractors', topCon, 'المشتريات', 'total', true);
+    renderRankList('lbTopProducts', topProds, 'الطلبات', 'count', false);
+    renderRankList('lbTopEntities', topEntities, 'السلع', 'count', false);
+
+  } catch(e) {
+    console.warn('Leaderboard error:', e);
+    ['lbTopMfg','lbTopContractors','lbTopProducts','lbTopEntities'].forEach(id => {
+      document.getElementById(id).innerHTML = '<div style="color:var(--danger);font-size:12px;text-align:center;padding:10px">خطأ في تحميل البيانات</div>';
+    });
+  }
+}
+
+// ============================================================
+// COMPLAINTS SYSTEM
+// ============================================================
+function openComplaintModal() {
+  document.getElementById('complaintType').value = '';
+  document.getElementById('complaintTarget').value = '';
+  document.getElementById('complaintDetails').value = '';
+  document.getElementById('complaintEmail').value = '';
+  document.getElementById('complaintPhone').value = '';
+  document.getElementById('complaintModal').classList.add('open');
+}
+
+async function submitComplaint() {
+  const type = document.getElementById('complaintType').value;
+  const target = document.getElementById('complaintTarget').value.trim();
+  const details = document.getElementById('complaintDetails').value.trim();
+  const email = document.getElementById('complaintEmail').value.trim();
+  const phone = document.getElementById('complaintPhone').value.trim();
+
+  if (!type) { showConfirm({ icon:'⚠️', title:'تنبيه', msg:'يرجى اختيار نوع الشكوى', okLabel:'حسناً', okColor:'var(--accent)', onOk:()=>{} }); return; }
+  if (!target) { showConfirm({ icon:'⚠️', title:'تنبيه', msg:'يرجى كتابة اسم الجهة المشتكى عليها', okLabel:'حسناً', okColor:'var(--accent)', onOk:()=>{} }); return; }
+  if (!details) { showConfirm({ icon:'⚠️', title:'تنبيه', msg:'يرجى كتابة تفاصيل الشكوى', okLabel:'حسناً', okColor:'var(--accent)', onOk:()=>{} }); return; }
+
+  const btn = document.getElementById('complaintSubmitBtn');
+  btn.textContent = 'جارٍ الإرسال...'; btn.disabled = true;
+
+  try {
+    const ref = 'CMP-' + Date.now().toString(36).toUpperCase();
+    await sbPost('complaints', {
+      ref, type, target, details, email, phone, status: 'pending',
+      created_at: new Date().toISOString()
+    });
+
+    document.getElementById('complaintModal').classList.remove('open');
+    showComplaintSuccess(ref);
+  } catch(e) {
+    // Save locally if table doesn't exist
+    let complaints = JSON.parse(localStorage.getItem('isnad_complaints') || '[]');
+    const ref = 'CMP-' + Date.now().toString(36).toUpperCase();
+    complaints.push({ ref, type, target, details, email, phone, status: 'pending', created_at: new Date().toISOString() });
+    localStorage.setItem('isnad_complaints', JSON.stringify(complaints));
+    document.getElementById('complaintModal').classList.remove('open');
+    showComplaintSuccess(ref);
+  }
+  btn.textContent = '📤 إرسال الشكوى'; btn.disabled = false;
+}
+
+function showComplaintSuccess(ref) {
+  document.getElementById('complaintSuccessRef').textContent = ref;
+  document.getElementById('complaintSuccessModal').classList.add('open');
+}
+
+// ============================================================
+// COMPLAINTS MANAGEMENT (Admin)
+// ============================================================
+let allComplaints = [];
+
+async function loadComplaints() {
+  const tbody = document.getElementById('complaintsTableBody');
+  tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--muted)">⏳ جارٍ التحميل...</td></tr>';
+  try {
+    allComplaints = await sbGet('complaints', 'order=created_at.desc');
+  } catch(e) {
+    allComplaints = JSON.parse(localStorage.getItem('isnad_complaints') || '[]');
+  }
+  renderComplaints(allComplaints);
+  document.getElementById('sideComplaintCount').textContent = allComplaints.filter(c => c.status === 'pending').length;
+}
+
+function renderComplaints(list) {
+  const tbody = document.getElementById('complaintsTableBody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--muted)">لا توجد شكاوى</td></tr>';
+    return;
+  }
+  const typeLabel = t => t === 'manufacturer' ? '🏭 مصنّع' : t === 'contractor' ? '🏗️ مقاول' : t === 'entity' ? '🏛️ جهة' : t;
+  const cStatusLabel = s => s === 'pending' ? 'قيد المراجعة' : s === 'in_progress' ? 'جاري المعالجة' : s === 'resolved' ? 'تم الحل' : s === 'closed' ? 'مغلقة' : s;
+  const cBadgeClass = s => s === 'resolved' ? 'approved' : s === 'closed' ? 'rejected' : s === 'in_progress' ? 'modification' : 'pending';
+
+  tbody.innerHTML = list.map((c, i) =>
+    '<tr>' +
+    '<td>' + (i+1) + '</td>' +
+    '<td><strong style="font-size:11px;direction:ltr">' + (c.ref||'—') + '</strong></td>' +
+    '<td>' + typeLabel(c.type) + '</td>' +
+    '<td><strong>' + (c.target||'—') + '</strong></td>' +
+    '<td style="max-width:200px;font-size:12px;white-space:normal;line-height:1.6">' + (c.details||'—') + '</td>' +
+    '<td style="font-size:11px;direction:ltr">' + (c.email||'—') + '</td>' +
+    '<td style="font-size:11px;direction:ltr">' + (c.phone||'—') + '</td>' +
+    '<td style="font-size:11px">' + fmtDate(c.created_at) + '</td>' +
+    '<td><span class="badge badge-' + cBadgeClass(c.status) + '">' + cStatusLabel(c.status) + '</span></td>' +
+    '<td style="white-space:nowrap">' +
+    '<select onchange="updateComplaintStatus(' + (c.id || i) + ',this.value,' + (c.id ? 'false' : 'true') + ')" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:Tajawal,sans-serif;font-size:11px">' +
+    '<option value="">تغيير</option>' +
+    '<option value="in_progress">جاري المعالجة</option>' +
+    '<option value="resolved">تم الحل</option>' +
+    '<option value="closed">إغلاق</option>' +
+    '</select></td></tr>'
+  ).join('');
+}
+
+function filterComplaints(val) {
+  const st = document.getElementById('complaintStatusFilter').value;
+  let filtered = allComplaints;
+  if (val) {
+    const lv = val.toLowerCase();
+    filtered = filtered.filter(c => (c.ref + c.target + c.details + c.type + c.email + c.phone).toLowerCase().includes(lv));
+  }
+  if (st) { filtered = filtered.filter(c => c.status === st); }
+  renderComplaints(filtered);
+}
+
+async function updateComplaintStatus(id, newStatus, isLocal) {
+  if (!newStatus) return;
+  if (isLocal) {
+    let complaints = JSON.parse(localStorage.getItem('isnad_complaints') || '[]');
+    if (complaints[id]) { complaints[id].status = newStatus; }
+    localStorage.setItem('isnad_complaints', JSON.stringify(complaints));
+  } else {
+    try { await sbPatch('complaints', id, { status: newStatus }); } catch(e) { console.warn(e); }
+  }
+  loadComplaints();
+}
+
+function loadRiadaPreference() {
+  const pref = localStorage.getItem('isnad_riada_pref') || '10';
+  document.getElementById('riadaPrefInput').value = pref;
+}
+
+function saveRiadaPreference() {
+  const val = document.getElementById('riadaPrefInput').value;
+  const pref = Math.max(0, Math.min(100, parseInt(val) || 10));
+  localStorage.setItem('isnad_riada_pref', pref.toString());
+  document.getElementById('riadaPrefInput').value = pref;
+  const msg = document.getElementById('riadaPrefMsg');
+  msg.textContent = '✅ تم حفظ نسبة الأفضلية: ' + pref + '% — سيتم تطبيقها على جميع سلع ريادة';
+  msg.style.display = 'block';
+  setTimeout(() => { msg.style.display = 'none'; }, 4000);
 }
 
 function doMfgLogout() {
@@ -3863,17 +4481,14 @@ function doMfgLogout() {
         <!-- PRODUCTS -->
         <div class="admin-section" id="sec-con-products">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-            <div><div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary)">📦 السلع المتاحة في قائمة المنتجات الوطنية</div><div style="font-size:13px;color:var(--muted);margin-top:4px">اختر السلع وحدد المبلغ بالريال العماني</div></div>
-            <input class="tbl-search" placeholder="🔍 بحث..." oninput="filterContractorProducts(this.value)" style="width:250px">
+            <div><div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary)">📦 السلع المتاحة في قائمة المنتجات الوطنية</div><div style="font-size:13px;color:var(--muted);margin-top:4px">اطلب عرض أسعار من المصنّع مباشرة</div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <input class="tbl-search" id="conAdvSearch" placeholder="🔍 بحث بالاسم، الشركة، السجل، المحافظة..." oninput="filterContractorProducts(this.value)" style="width:320px">
+            </div>
           </div>
           <div class="tbl-card"><div style="overflow-x:auto"><table id="conProductsTable"><thead><tr>
-            <th style="width:50px"><input type="checkbox" id="conSelectAll" onchange="toggleSelectAllProducts(this)"></th>
-            <th>#</th><th>اسم السلعة</th><th>الشركة المصنعة</th><th>رقم السجل</th><th>المحافظة</th><th>البريد الإلكتروني</th><th>رقم الهاتف</th><th>المبلغ (ر.ع)</th>
-          </tr></thead><tbody id="conProductsBody"><tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">⏳ جارٍ تحميل السلع...</td></tr></tbody></table></div></div>
-          <div style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-            <div style="font-size:14px;color:var(--primary);font-weight:700">السلع المحددة: <span id="conSelectedCount" style="color:var(--accent)">0</span> | الإجمالي: <span id="conSelectedTotal" style="color:var(--success)">0.000</span> ر.ع</div>
-            <button class="btn-login" onclick="submitContractorOrder()" style="width:auto;padding:12px 36px;background:linear-gradient(135deg,var(--success),#34d399);font-size:15px">✅ اعتماد وإرسال الطلب</button>
-          </div>
+            <th>#</th><th>اسم السلعة</th><th>الشركة المصنعة</th><th>رقم السجل</th><th>المحافظة</th><th>البريد الإلكتروني</th><th>رقم الهاتف</th><th>طلب عرض سعر</th>
+          </tr></thead><tbody id="conProductsBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--muted)">⏳ جارٍ تحميل السلع...</td></tr></tbody></table></div></div>
         </div>
         <!-- ORDERS -->
         <div class="admin-section" id="sec-con-orders">
@@ -3901,14 +4516,107 @@ function doMfgLogout() {
   <div class="login-modal" style="width:520px;max-width:95vw;text-align:center">
     <button class="modal-close" onclick="document.getElementById('conOrderSuccessModal').classList.remove('open')">✕</button>
     <div style="font-size:56px;margin-bottom:12px">🎉</div>
-    <div style="font-family:'Cairo',sans-serif;font-size:22px;font-weight:900;color:var(--success);margin-bottom:8px">تم إرسال الطلب بنجاح!</div>
-    <div style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.8">تم إرسال بريد إلكتروني إلى أصحاب السلع المحددة — بانتظار موافقتهم</div>
+    <div style="font-family:'Cairo',sans-serif;font-size:22px;font-weight:900;color:var(--success);margin-bottom:8px">تم إرسال طلب عرض السعر!</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.8">تم إرسال الطلب للمصنّع — مهلة الاستجابة يومين عمل</div>
     <div id="conOrderSuccessDetails" style="background:#f0fdf4;border:2px solid #bbf7d0;border-radius:14px;padding:16px;text-align:right;margin-bottom:20px;max-height:300px;overflow-y:auto"></div>
     <button class="btn-login" onclick="document.getElementById('conOrderSuccessModal').classList.remove('open')" style="background:linear-gradient(135deg,var(--success),#34d399)">حسناً</button>
   </div>
 </div>
 
+<!-- RFQ MODAL -->
+<div class="modal-overlay" id="rfqModal">
+  <div class="login-modal" style="width:560px;max-width:95vw">
+    <button class="modal-close" onclick="document.getElementById('rfqModal').classList.remove('open')">✕</button>
+    <div class="login-logo">
+      <div class="login-logo-icon" style="background:linear-gradient(135deg,var(--accent),var(--accent-light))">📋</div>
+      <div class="login-title">طلب عرض سعر</div>
+      <div class="login-sub">أدخل تفاصيل طلبك ليتم إرساله للمصنّع</div>
+    </div>
+    <input type="hidden" id="rfqIdx" value="">
+    <!-- Product info -->
+    <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--muted)">السلعة:</span><strong id="rfqProductName" style="color:var(--primary);font-size:13px">—</strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--muted)">المصنّع:</span><strong id="rfqCompany" style="color:var(--text);font-size:12px">—</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--muted)">المحافظة:</span><strong id="rfqGov" style="color:var(--text);font-size:12px">—</strong></div>
+    </div>
+    <!-- Fields -->
+    <div class="login-field"><label>الكمية المطلوبة <span style="color:var(--accent)">*</span></label><input type="text" id="rfqQty" placeholder="مثال: 500 طن، 1000 وحدة"></div>
+    <div class="login-field"><label>محافظة التسليم <span style="color:var(--accent)">*</span></label><select id="rfqDeliveryGov" onchange="onRFQGovChange()" style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px"><option value="">-- اختر المحافظة --</option></select></div>
+    <div class="login-field" id="rfqDeliveryWilayaField" style="display:none"><label>ولاية التسليم</label><select id="rfqDeliveryWilaya" style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px"><option value="">-- اختر الولاية --</option></select></div>
+    <div class="login-field"><label>تاريخ التسليم المطلوب <span style="color:var(--accent)">*</span></label><input type="date" id="rfqDeliveryDate" style="direction:ltr"></div>
+    <div class="login-field"><label>مواصفات خاصة <span style="font-size:11px;color:var(--muted)">(اختياري)</span></label><textarea id="rfqSpecs" rows="3" placeholder="اكتب أي مواصفات أو متطلبات خاصة بالسلعة..." style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;resize:vertical"></textarea></div>
+    <div style="background:#fef3c7;border:1.5px solid #fbbf24;border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;gap:8px;align-items:center"><span style="font-size:18px">⏳</span><div style="font-size:12px;color:#92400e;line-height:1.6">مهلة الاستجابة من المصنّع: <strong>يومين عمل</strong> من تاريخ الإرسال</div></div>
+    <button class="btn-login" id="rfqSubmitBtn" onclick="submitRFQ()" style="background:linear-gradient(135deg,var(--accent),var(--accent-light))">📤 إرسال طلب عرض السعر</button>
+  </div>
+</div>
+
 <!-- ==================== MANUFACTURER LOGIN MODAL ==================== -->
+
+<!-- MFG APPROVE MODAL -->
+<div class="modal-overlay" id="mfgApproveModal">
+  <div class="login-modal" style="width:480px;max-width:95vw">
+    <button class="modal-close" onclick="document.getElementById('mfgApproveModal').classList.remove('open')">✕</button>
+    <div class="login-logo">
+      <div class="login-logo-icon" style="background:linear-gradient(135deg,var(--success),#34d399)">✅</div>
+      <div class="login-title">الموافقة وتقديم عرض السعر</div>
+      <div class="login-sub">أدخل سعر الوحدة والكمية لإرسال العرض للمقاول</div>
+    </div>
+    <div style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:16px;text-align:center">
+      <span style="font-size:13px;color:var(--muted)">السلعة: </span><strong id="mfgApproveProduct" style="color:var(--primary)">—</strong>
+    </div>
+    <div class="login-field"><label>سعر الوحدة (ر.ع) <span style="color:var(--accent)">*</span></label><input type="number" id="mfgApproveUnitPrice" min="0" step="0.001" placeholder="0.000" dir="ltr" style="text-align:center" oninput="calcMfgTotal()"></div>
+    <div class="login-field"><label>الكمية <span style="color:var(--accent)">*</span></label><input type="number" id="mfgApproveQty" min="1" step="1" placeholder="أدخل الكمية" dir="ltr" style="text-align:center" oninput="calcMfgTotal()"></div>
+    <div style="background:#f0fdf4;border:2px solid #bbf7d0;border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">المبلغ الإجمالي</div>
+      <div style="font-size:24px;font-weight:900;color:var(--success)"><span id="mfgApproveTotal">0.000</span> <span style="font-size:14px">ر.ع</span></div>
+    </div>
+    <button class="btn-login" onclick="submitMfgApproval()" style="background:linear-gradient(135deg,var(--success),#34d399)">✅ الموافقة وإرسال عرض السعر</button>
+  </div>
+</div>
+
+<!-- MFG REJECT MODAL -->
+<div class="modal-overlay" id="mfgRejectModal">
+  <div class="login-modal" style="width:480px;max-width:95vw">
+    <button class="modal-close" onclick="document.getElementById('mfgRejectModal').classList.remove('open')">✕</button>
+    <div class="login-logo">
+      <div class="login-logo-icon" style="background:linear-gradient(135deg,#ef4444,#f87171)">❌</div>
+      <div class="login-title">رفض طلب عرض السعر</div>
+      <div class="login-sub">اختر سبب الرفض أو اكتبه</div>
+    </div>
+    <div class="login-field">
+      <label>سبب الرفض <span style="color:var(--accent)">*</span></label>
+      <select id="mfgRejectPreset" onchange="document.getElementById('mfgRejectReason').value=this.value" style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;margin-bottom:8px">
+        <option value="">-- اختر سبب الرفض --</option>
+        <option value="الكمية المطلوبة غير متوفرة حالياً">الكمية المطلوبة غير متوفرة حالياً</option>
+        <option value="المواصفات المطلوبة لا تتوافق مع منتجاتنا">المواصفات المطلوبة لا تتوافق مع منتجاتنا</option>
+        <option value="تاريخ التسليم المطلوب غير قابل للتحقيق">تاريخ التسليم المطلوب غير قابل للتحقيق</option>
+        <option value="مكان التسليم خارج نطاق التوزيع">مكان التسليم خارج نطاق التوزيع</option>
+        <option value="المنتج متوقف عن الإنتاج مؤقتاً">المنتج متوقف عن الإنتاج مؤقتاً</option>
+        <option value="لدينا التزامات سابقة تمنعنا من التوريد حالياً">لدينا التزامات سابقة تمنعنا من التوريد حالياً</option>
+      </select>
+      <textarea id="mfgRejectReason" rows="3" placeholder="أو اكتب سبب الرفض هنا..." style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;resize:vertical"></textarea>
+    </div>
+    <button class="btn-login" onclick="submitMfgRejection()" style="background:linear-gradient(135deg,#ef4444,#f87171)">❌ رفض الطلب</button>
+  </div>
+</div>
+
+<!-- MFG MODIFY MODAL -->
+<div class="modal-overlay" id="mfgModifyModal">
+  <div class="login-modal" style="width:480px;max-width:95vw">
+    <button class="modal-close" onclick="document.getElementById('mfgModifyModal').classList.remove('open')">✕</button>
+    <div class="login-logo">
+      <div class="login-logo-icon" style="background:linear-gradient(135deg,var(--info),#60a5fa)">✏️</div>
+      <div class="login-title">طلب تعديل</div>
+      <div class="login-sub">اكتب ملاحظاتك ليقوم المقاول بتعديل الطلب</div>
+    </div>
+    <div class="login-field">
+      <label>ملاحظات التعديل المطلوب <span style="color:var(--accent)">*</span></label>
+      <textarea id="mfgModifyNote" rows="4" placeholder="مثال: يرجى تعديل الكمية أو تاريخ التسليم أو المواصفات..." style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;resize:vertical"></textarea>
+    </div>
+    <button class="btn-login" onclick="submitMfgModify()" style="background:linear-gradient(135deg,var(--info),#60a5fa)">✏️ إرسال طلب التعديل</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="mfgLoginModal">
   <div class="login-modal">
     <button class="modal-close" onclick="closeMfgLogin()">✕</button>
@@ -4004,7 +4712,7 @@ function doMfgLogout() {
         <!-- MFG INCOMING ORDERS -->
         <div class="admin-section" id="sec-mfg-orders">
           <div style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:var(--primary);margin-bottom:6px">🔔 طلبات الشراء الواردة من المقاولين</div>
-          <div style="font-size:13px;color:var(--muted);margin-bottom:20px">يمكنك الموافقة أو الرفض على كل طلب شراء — ويمكنك إصدار فاتورة PDF لكل طلب</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:20px">يمكنك الموافقة أو الرفض على كل طلب شراء — ويمكنك إصدار عرض أسعار PDF لكل طلب</div>
           <div id="mfgOrdersContainer"><div style="color:var(--muted);font-size:13px;text-align:center;padding:40px">لا توجد طلبات واردة بعد</div></div>
         </div>
         <!-- MFG MY PRODUCTS -->
@@ -4034,6 +4742,50 @@ function doMfgLogout() {
   </div>
 </div>
 
+
+<!-- COMPLAINT MODAL -->
+<div class="modal-overlay" id="complaintModal">
+  <div class="login-modal" style="width:520px;max-width:95vw">
+    <button class="modal-close" onclick="document.getElementById('complaintModal').classList.remove('open')">✕</button>
+    <div class="login-logo">
+      <div class="login-logo-icon" style="background:linear-gradient(135deg,#ef4444,#f87171)">📝</div>
+      <div class="login-title">تقديم شكوى</div>
+      <div class="login-sub">سيتم مراجعة شكواك من قبل الجهة المختصة</div>
+    </div>
+    <div class="login-field">
+      <label>نوع الشكوى <span style="color:var(--accent)">*</span></label>
+      <select id="complaintType" style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px">
+        <option value="">-- اختر نوع الشكوى --</option>
+        <option value="manufacturer">شكوى ضد مصنّع</option>
+        <option value="contractor">شكوى ضد مقاول</option>
+        <option value="entity">شكوى ضد جهة</option>
+      </select>
+    </div>
+    <div class="login-field"><label>اسم الجهة المشتكى عليها <span style="color:var(--accent)">*</span></label><input type="text" id="complaintTarget" placeholder="اسم المصنع أو المقاول أو الجهة"></div>
+    <div class="login-field"><label>تفاصيل الشكوى <span style="color:var(--accent)">*</span></label><textarea id="complaintDetails" rows="4" placeholder="اكتب تفاصيل الشكوى هنا..." style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;resize:vertical"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="login-field"><label>البريد الإلكتروني</label><input type="email" id="complaintEmail" placeholder="email@example.com" dir="ltr"></div>
+      <div class="login-field"><label>رقم الهاتف</label><input type="tel" id="complaintPhone" placeholder="9XXXXXXX" dir="ltr"></div>
+    </div>
+    <button class="btn-login" id="complaintSubmitBtn" onclick="submitComplaint()" style="background:linear-gradient(135deg,#ef4444,#f87171)">📤 إرسال الشكوى</button>
+  </div>
+</div>
+
+<!-- COMPLAINT SUCCESS MODAL -->
+<div class="modal-overlay" id="complaintSuccessModal">
+  <div class="login-modal" style="width:460px;max-width:95vw;text-align:center">
+    <button class="modal-close" onclick="document.getElementById('complaintSuccessModal').classList.remove('open')">✕</button>
+    <div style="font-size:64px;margin-bottom:8px">✅</div>
+    <div style="font-family:'Cairo',sans-serif;font-size:22px;font-weight:900;color:var(--success);margin-bottom:8px">تم إرسال الشكوى بنجاح</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.8">سيتم مراجعة شكواك من قبل الجهة المختصة</div>
+    <div style="background:#f0fdf4;border:2px solid #bbf7d0;border-radius:14px;padding:20px;margin-bottom:20px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px">رقم الشكوى</div>
+      <div style="font-size:20px;font-weight:900;color:var(--primary);direction:ltr" id="complaintSuccessRef">—</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">يرجى الاحتفاظ بهذا الرقم للمتابعة</div>
+    </div>
+    <button class="btn-login" onclick="document.getElementById('complaintSuccessModal').classList.remove('open')" style="background:linear-gradient(135deg,var(--success),#34d399)">حسناً</button>
+  </div>
+</div>
 
 <!-- DB Setup Modal -->
 <div class="modal-overlay" id="dbSetupModal">
